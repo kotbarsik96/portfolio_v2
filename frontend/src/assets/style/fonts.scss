@@ -1,0 +1,166 @@
+/* <MONTSERRAT>================================================================================ */
+@font-face {
+    font-family: "Montserrat";
+    src: url("../fonts/montserrat/Montserrat-Regular.eot?g7z9lc");
+    src:
+        url("../fonts/montserrat/Montserrat-Regular.eot?g7z9lc#iefix") format("embedded-opentype"),
+        url("../fonts/montserrat/Montserrat-Regular.ttf?g7z9lc") format("truetype"),
+        url("../fonts/montserrat/Montserrat-Regular.woff?g7z9lc") format("woff"),
+        url("../fonts/montserrat/Montserrat-Regular.svg?g7z9lc#icon") format("svg");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Montserrat";
+    src: url("../fonts/montserrat/Montserrat-Italic.eot?g7z9lc");
+    src:
+        url("../fonts/montserrat/Montserrat-Italic.eot?g7z9lc#iefix") format("embedded-opentype"),
+        url("../fonts/montserrat/Montserrat-Italic.ttf?g7z9lc") format("truetype"),
+        url("../fonts/montserrat/Montserrat-Italic.woff?g7z9lc") format("woff"),
+        url("../fonts/montserrat/Montserrat-Italic.svg?g7z9lc#icon") format("svg");
+    font-weight: normal;
+    font-style: italic;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Montserrat";
+    src: url("../fonts/montserrat/Montserrat-Medium.eot?g7z9lc");
+    src:
+        url("../fonts/montserrat/Montserrat-Medium.eot?g7z9lc#iefix") format("embedded-opentype"),
+        url("../fonts/montserrat/Montserrat-Medium.ttf?g7z9lc") format("truetype"),
+        url("../fonts/montserrat/Montserrat-Medium.woff?g7z9lc") format("woff"),
+        url("../fonts/montserrat/Montserrat-Medium.svg?g7z9lc#icon") format("svg");
+    font-weight: 500;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Montserrat";
+    src: url("../fonts/montserrat/Montserrat-Bold.eot?g7z9lc");
+    src:
+        url("../fonts/montserrat/Montserrat-Bold.eot?g7z9lc#iefix") format("embedded-opentype"),
+        url("../fonts/montserrat/Montserrat-Bold.ttf?g7z9lc") format("truetype"),
+        url("../fonts/montserrat/Montserrat-Bold.woff?g7z9lc") format("woff"),
+        url("../fonts/montserrat/Montserrat-Bold.svg?g7z9lc#icon") format("svg");
+    font-weight: 700;
+    font-style: normal;
+    font-display: block;
+}
+
+/* <ICON-FONT>================================================================================ */
+@font-face {
+    font-family: "icon";
+    src: url("../fonts/icon-font/icon.eot?g7z9lc");
+    src:
+        url("../fonts/icon-font/icon.eot?g7z9lc#iefix") format("embedded-opentype"),
+        url("../fonts/icon-font/icon.ttf?g7z9lc") format("truetype"),
+        url("../fonts/icon-font/icon.woff?g7z9lc") format("woff"),
+        url("../fonts/icon-font/icon.svg?g7z9lc#icon") format("svg");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+[class^="icon-"]::before,
+[class*=" icon-"]::before {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: "icon" !important;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-exit:before {
+    content: "\e91b";
+}
+.icon-turn-back:before {
+    content: "\e91a";
+}
+.icon-pause:before {
+    content: "\e919";
+}
+.icon-expand:before {
+    content: "\e918";
+}
+.icon-image:before {
+    content: "\e916";
+}
+.icon-video:before {
+    content: "\e917";
+}
+.icon-kw:before {
+    content: "\e914";
+}
+.icon-github:before {
+    content: "\e915";
+}
+.icon-chevron-right:before {
+    content: "\e913";
+}
+.icon-mobile:before {
+    content: "\e900";
+}
+.icon-desktop:before {
+    content: "\e901";
+}
+.icon-question-mark:before {
+    content: "\e902";
+}
+.icon-activity:before {
+    content: "\e903";
+}
+.icon-add-image:before {
+    content: "\e904";
+}
+.icon-add-video:before {
+    content: "\e905";
+}
+.icon-cancel:before {
+    content: "\e906";
+}
+.icon-circle-minus:before {
+    content: "\e907";
+}
+.icon-filter:before {
+    content: "\e908";
+}
+.icon-moon:before {
+    content: "\e909";
+}
+.icon-pencil:before {
+    content: "\e90a";
+}
+.icon-person:before {
+    content: "\e90b";
+}
+.icon-play-video:before {
+    content: "\e90c";
+}
+.icon-portfolio:before {
+    content: "\e90d";
+}
+.icon-programming:before {
+    content: "\e90e";
+}
+.icon-search:before {
+    content: "\e90f";
+}
+.icon-sun:before {
+    content: "\e910";
+}
+.icon-telegram:before {
+    content: "\e911";
+}
+.icon-web-development:before {
+    content: "\e912";
+}
