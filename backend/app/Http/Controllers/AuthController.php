@@ -31,6 +31,9 @@ class AuthController extends Controller
     public function checkAuth(Request $request)
     {
         $user = User::where('name', e($request['name']))->first();
+        if (empty($user))
+            return response(['is_me' => false]);
+        
         $token = $user->tokens()->where('name', $user->name)->first();
 
         if ($user && $token)

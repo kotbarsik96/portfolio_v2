@@ -32,7 +32,10 @@ export default {
         async register() {
             this.isLoading = true;
             const data = getDataFromForms(this.$refs.form);
-            await restApiPostMethod(data, 'json', { method: 'register' });
+            const res = await restApiPostMethod(data, 'json', { method: 'register' });
+            if (res.user) {
+                this.$router.push({ name: 'Auth' });
+            }
             this.isLoading = false;
         },
     },
