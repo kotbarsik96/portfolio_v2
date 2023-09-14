@@ -2,17 +2,17 @@
     <div class="container">
         <section class="hello-form" ref="form" @keyup="(event) => event.key === 'Enter' ? register() : false">
             <MyLoading v-if="isLoading" isAbsolute></MyLoading>
-            <InputItem class="input-item--full" label="Логин" id="name" name="name" placeholder="Логин">
+            <InputItem class="input-item--full" label="Логин" id="name" name="name" placeholder="Логин" value="illusiveman">
             </InputItem>
-            <InputItem class="input-item--full" label="Email" id="email" name="email" placeholder="Email">
+            <InputItem class="input-item--full" label="Email" id="email" name="email" placeholder="Email" value="kotbarsik96@gmail.com">
             </InputItem>
-            <InputItem class="input-item--full" label="Телеграм" id="telegram" name="telegram" placeholder="Телеграм">
+            <InputItem class="input-item--full" label="Телеграм" id="telegram" name="telegram" placeholder="Телеграм" value="t.me/kotbarsik96">
             </InputItem>
             <InputItem class="input-item--full" label="Пароль" id="pass" type="password" placeholder="Пароль"
-                name="password">
+                name="password" value="Wh19t30213035;">
             </InputItem>
             <InputItem class="input-item--full" label="Подтверждение пароля" id="pass_confirm" type="password"
-                placeholder="Подтверждение пароля" name="password_confirmation">
+                placeholder="Подтверждение пароля" name="password_confirmation" value="Wh19t30213035;">
             </InputItem>
             <button class="button" type="submit" @click.prevent="register">
                 Регистрация
@@ -22,9 +22,10 @@
 </template>
 
 <script>
-import { getDataFromForms, restApiPostMethod } from '@/assets/scripts/scripts.js';
+import { getDataFromForms } from '@/assets/scripts/scripts.js';
 import { useMyStore } from '@/stores/store';
 import { mapState } from 'pinia';
+import axios from 'axios';
 
 export default {
     name: 'RegisterMe',
@@ -32,9 +33,11 @@ export default {
         async register() {
             this.isLoading = true;
             const data = getDataFromForms(this.$refs.form);
-            const res = await restApiPostMethod(data, 'json', { method: 'register' });
-            if (res.user) {
-                this.$router.push({ name: 'Auth' });
+            const res = await axios.post(`${import.meta.env.VITE_API_LINK}register`, data);
+            console.log(res);
+            useMyStore().qrCode = res.data.auth_qr_code;
+            if (res.data.user) {
+                this.$router.push({ name: 'ShowQr' });
             }
             this.isLoading = false;
         },

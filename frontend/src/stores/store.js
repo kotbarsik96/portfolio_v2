@@ -1,37 +1,51 @@
 import { defineStore } from "pinia";
-import { restApiPostMethod } from "@/assets/scripts/scripts.js";
+import axios from "axios";
+import Cookie from "js-cookie";
+
+axios.defaults.withCredentials = true;
+
 export const useMyStore = defineStore("myStore", {
     state() {
         return {
             theme: localStorage.getItem("kb96_portfolio_theme") || "light",
             isMe: false,
+            qrCode: null
         }
     },
     actions: {
         async checkIfIsMe() {
-            const token = localStorage.getItem("kb96token");
-            const name = localStorage.getItem("kb96user");
-            if (!token || !name)
+            try {
+                const user = Cookie.get("user");
+                const userId = Cookie.get("user_id");
+                if (!user || !userId) {
+                    this.isMe = false;
+                    return false;
+                }
+
+                const res = await axios.post(`${import.meta.env.VITE_API_LINK}check-auth`, {
+                    user,
+                    userId
+                });
+                if (res && res.data && res.data.success) {
+                    this.isMe = true;
+                    return true;
+                }
+
+                this.isMe = false;
                 return false;
-
-            const data = { token, name };
-            const res = await restApiPostMethod(data, "json", { method: "check-auth" });
-            if (res.is_me) {
-                this.isMe = true;
-                return true;
+            } catch (err) {
+                // console.error(err);
             }
-
-            return false;
         },
         async logout() {
             this.isMe = false;
-            const token = localStorage.getItem("kb96token");
-            const name = localStorage.getItem("kb96user");
-            localStorage.removeItem("kb96token");
-            localStorage.removeItem("kb96user");
 
-            const data = { token, name };
-            const res = await restApiPostMethod(data, "json", { method: "logout" });
+            try {
+                await axios.post(`${import.meta.env.VITE_API_LINK}logout`);
+            } catch (err) { }
+
+            Cookie.remove("user");
+            Cookie.remove("user_id");
         }
     }
 });

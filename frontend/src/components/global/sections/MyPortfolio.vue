@@ -47,8 +47,7 @@ export default {
         MyFilter
     },
     async mounted() {
-        const response = await fetch(`${import.meta.env.VITE_API_LINK}works`);
-        this.works = await response.json();
+        
     },
     data() {
         return {

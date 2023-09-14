@@ -106,9 +106,9 @@ export function startZero(num, length = 2) {
     const numLength = num.toString().length;
     if (numLength < length) {
         const diff = length - numLength;
-        let zeros = '0';
+        let zeros = "0";
         while (zeros.length < diff) {
-            zeros += '0';
+            zeros += "0";
         }
 
         newNum = `${zeros}${num}`;
@@ -117,7 +117,7 @@ export function startZero(num, length = 2) {
 }
 
 export async function setEditable(el) {
-    el.setAttribute('contenteditable', true);
+    el.setAttribute("contenteditable", true);
 
     await delay(0);
 
@@ -133,100 +133,12 @@ export async function setEditable(el) {
 }
 
 export function getTextContent(el) {
-    return el.textContent.trim().replace(/\s{2,}/g, '');
-}
-
-export async function restApiPostMethod(dataToPost, parseResponseMethod = 'json', options = {}) {
-    let url = options.url || import.meta.env.VITE_API_LINK;
-    if (options.method)
-        url += options.method;
-
-    const body = new FormData();
-    for (let key in dataToPost) {
-        body.append(key, dataToPost[key]);
-    }
-
-    const headers = {
-        "Accept": "application/json"
-    };
-    if (localStorage.getItem('kb96token'))
-        headers['Authentication'] = localStorage.getItem('kb96token');
-
-    const response = await fetch(url, {
-        method: "POST",
-        headers,
-        body,
-    });
-    if (response && typeof response[parseResponseMethod] === "function") {
-        const result = await response[parseResponseMethod]();
-        return result;
-    }
-
-    return response;
-}
-
-export async function restApiDeleteMethod(dataToDelete, parseResponseMethod = 'json', options = {}) {
-    let url = options.url || import.meta.env.VITE_API_LINK;
-    if (options.method)
-        url += options.method;
-
-    const body = new FormData();
-    for (let key in dataToDelete) {
-        body.append(key, dataToDelete[key]);
-    }
-
-    const headers = {
-        "Accept": "application/json"
-    };
-    if (localStorage.getItem('kb96token'))
-        headers['Authentication'] = localStorage.getItem('kb96token');
-
-    const response = await fetch(url, {
-        method: "DELETE",
-        headers,
-        body,
-    });
-    if (response && typeof response[parseResponseMethod] === "function") {
-        const result = await response[parseResponseMethod]();
-        return result;
-    }
-
-    return response;
-}
-
-export async function restApiPutMethod(dataToPut, parseResponseMethod = 'json', options = {}) {
-    let url = options.url || import.meta.env.VITE_API_LINK;
-    if (options.method)
-        url += options.method;
-
-    const body = [];
-    for (let key in dataToPut) {
-        body.push(encodeURIComponent(key) + '=' + encodeURIComponent(dataToPut[key]));
-    }
-
-    const headers = {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Accept": "application/json"
-    };
-    if (localStorage.getItem('kb96token'))
-        headers['Authentication'] = localStorage.getItem('kb96token');
-
-    const response = await fetch(url, {
-        method: "PUT",
-        headers,
-        body,
-    });
-    if (response && typeof response[parseResponseMethod] === "function") {
-        const result = await response[parseResponseMethod]();
-        return result;
-    }
-
-    return response;
+    return el.textContent.trim().replace(/\s{2,}/g, "");
 }
 
 export function getDataFromForms(form) {
     const data = {};
-    qsAll('input[name]', form).forEach(input => {
+    qsAll("input[name]", form).forEach(input => {
         data[input.name] = input.value;
     });
     return data;

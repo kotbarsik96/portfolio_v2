@@ -87,8 +87,13 @@ const router = createRouter({
             }
         },
         {
+            path: '/qr-code',
+            name: 'ShowQr',
+            component: () => import('@/views/ShowQr.vue'),
+        },
+        {
             path: '/isitreallyyou',
-            name: 'SubAuth',
+            name: 'DoubleAuth',
             component: () => import('@/views/DoubleAuthMe.vue'),
             meta: {
                 mustNotBeMe: true
