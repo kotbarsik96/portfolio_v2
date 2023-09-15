@@ -43,7 +43,6 @@
 <script>
 import MyFilter from '@/components/global/MyFilter.vue';
 import LoadImage from '@/components/private/LoadImage.vue';
-import { restApiPostMethod, restApiPutMethod, restApiDeleteMethod } from '@/assets/scripts/scripts.js';
 
 export default {
     name: 'MyWork',

@@ -35,9 +35,6 @@
 <script>
 import LoadImage from '@/components/private/LoadImage.vue';
 import LoadVideo from '@/components/private/LoadVideo.vue';
-import {
-    restApiPostMethod, restApiDeleteMethod, restApiPutMethod, restApiGetMethod
-} from '@/assets/scripts/scripts.js';
 
 export default {
     name: 'MySkill',
