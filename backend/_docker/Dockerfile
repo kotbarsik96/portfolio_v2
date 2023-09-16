@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+RUN apt-get update && apt-get install -y libjpeg-dev libpng-dev && docker-php-ext-configure gd --with-jpeg && docker-php-ext-install gd
+
 COPY ./backend/_docker/php.ini /usr/local/etc/php/conf.d/php.ini
 
 ENV COMPOSER_ALLOW_SUPERUSER=1

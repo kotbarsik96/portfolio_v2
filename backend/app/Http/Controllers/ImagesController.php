@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Images;
+use App\Models\Image as ImageModel;
 use Illuminate\Http\Request;
+use Intervention\Image\Facades\Image as ImageIntervention;
 
 class ImagesController extends Controller
 {
+    private $storeFolderName = 'images';
+
     public function validateRequest(Request $request)
     {
         return $request->validate([
@@ -16,24 +19,28 @@ class ImagesController extends Controller
 
     public function store(Request $request)
     {
-        return response(['success' => true]);
+        $this->validateRequest($request);
+        $image = $request->file('image');
+        $imgName = time() . '.' . $image->extension();
+        $image->move(public_path($this->storeFolderName), $imgName);
 
-        // $this->validateRequest($request);
-        // $image = $request->file('image');
-        // $imgName = time() . '.' . $image->extension();
-        // $image->move(public_path('images'), $imgName);
-
-        // return Images::create([
-        //     'path' => public_path('images/' . $imgName),
-        //     'size' => $image->getMaxFilesize()
-        // ]);
+        $imageData = ImageIntervention::make(public_path($this->storeFolderName) . '/' . $imgName);
+        $imageHeight = $imageData->height();
+        $imageWidth = $imageData->width();
+        $path = $this->storeFolderName . '/' . $imgName;
+        return ImageModel::create([
+            'path' => $path,
+            'size' => $imageData->filesize() / 1024, // кб
+            'width' => $imageWidth,
+            'height' => $imageHeight,
+        ]);
     }
 
     public function update(Request $request, $id)
     {
         $fields = $this->validateRequest($request);
 
-        $image = Images::find($id);
+        $image = ImageModel::find($id);
         if (!$image)
             return response(['error' => true]);
 
@@ -43,7 +50,7 @@ class ImagesController extends Controller
 
     public function destroy($id)
     {
-        $image = Images::find($id);
+        $image = ImageModel::find($id);
         if (!$image)
             return response(['not_found' => true]);
 

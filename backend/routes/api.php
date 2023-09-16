@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WorksController;
 use App\Http\Controllers\ImagesController;
+use App\Http\Controllers\VideoController;
 use App\Http\Controllers\SkillsController;
 
 /*
@@ -45,4 +46,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/image', [ImagesController::class, 'store']);
     Route::put('/image/{id}', [ImagesController::class, 'update']);
     Route::delete('/image/{id}', [ImagesController::class, 'destroy']);
+
+    // video
+    Route::post('/video', [VideoController::class, 'store']);
+    Route::put('/video/{id}', [VideoController::class, 'update']);
+    Route::delete('/video/{id}', [VideoController::class, 'destroy']);
 });

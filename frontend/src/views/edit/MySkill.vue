@@ -14,7 +14,7 @@
                     <LoadImage title="Изображение" ref="imageLoadComponent"></LoadImage>
                 </div>
                 <div class="add__load-media-item">
-                    <LoadVideo title="Видео"></LoadVideo>
+                    <LoadVideo title="Видео" ref="videoLoadComponent"></LoadVideo>
                 </div>
             </div>
             <div class="add__buttons">
@@ -35,6 +35,7 @@
 <script>
 import LoadImage from '@/components/private/LoadImage.vue';
 import LoadVideo from '@/components/private/LoadVideo.vue';
+import axios from 'axios';
 
 export default {
     name: 'MySkill',
@@ -51,14 +52,27 @@ export default {
         },
         async load() {
             const imageLoadComponent = this.$refs.imageLoadComponent;
-            if (!imageLoadComponent)
+            const videoLoadComponent = this.$refs.videoLoadComponent;
+            if (!imageLoadComponent || !videoLoadComponent)
                 return;
 
             const image = imageLoadComponent.$refs.input.files;
-            if (image.length > 0) {
-                const data = { image };
-                const res = await restApiPostMethod(data, 'json', { method: 'image' });
-                console.log(res);
+            const video = videoLoadComponent.$refs.input.files;
+            if (image.length > 0)
+                loadImage();
+            if (video.length > 0)
+                loadVideo();
+
+            function loadImage() {
+                const data = new FormData();
+                data.append('image', image[0]);
+                axios.post(`${import.meta.env.VITE_API_LINK}image`, data);
+            }
+            function loadVideo() {
+                const data = new FormData();
+                data.append('video', video[0]);
+                console.log(video[0]);
+                axios.post(`${import.meta.env.VITE_API_LINK}video`, data);
             }
         }
     }

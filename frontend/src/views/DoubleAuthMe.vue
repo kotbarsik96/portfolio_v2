@@ -48,8 +48,8 @@ export default {
                 return;
             }
 
-            Cookies.set('user_id', res.data.user.id);
-            Cookies.set('user', res.data.userSecret);
+            Cookies.set('user_id', res.data.user.id, { expires: 365 });
+            Cookies.set('user', res.data.userSecret, { expires: 365 });
 
             store.checkIfIsMe();
             store.authData = null;
