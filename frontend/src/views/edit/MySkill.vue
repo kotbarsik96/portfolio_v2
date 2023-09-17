@@ -15,6 +15,15 @@
                 </div>
                 <div class="add__load-media-item">
                     <LoadVideo title="Видео" ref="videoLoadComponent"></LoadVideo>
+                    <Transition name="fade-in">
+                        <div v-if="videoLoadProgress && videoLoadProgress > 0" class="loading-scale">
+                            <div class="loading-scale__progressbar" :style="{ 'width': `${videoLoadProgress}%` }"></div>
+                            <div class="loading-scale__percentage">
+                                {{ videoLoadProgress }}
+                                %
+                            </div>
+                        </div>
+                    </Transition>
                 </div>
             </div>
             <div class="add__buttons">
@@ -36,12 +45,19 @@
 import LoadImage from '@/components/private/LoadImage.vue';
 import LoadVideo from '@/components/private/LoadVideo.vue';
 import axios from 'axios';
+import Resumable from 'resumablejs';
+import Cookie from 'js-cookie';
 
 export default {
     name: 'MySkill',
     components: {
         LoadImage,
         LoadVideo
+    },
+    data(){
+        return {
+            videoLoadProgress: 0
+        }
     },
     methods: {
         async update() {
@@ -51,28 +67,52 @@ export default {
 
         },
         async load() {
+            const self = this;
             const imageLoadComponent = this.$refs.imageLoadComponent;
             const videoLoadComponent = this.$refs.videoLoadComponent;
             if (!imageLoadComponent || !videoLoadComponent)
                 return;
 
             const image = imageLoadComponent.$refs.input.files;
-            const video = videoLoadComponent.$refs.input.files;
             if (image.length > 0)
                 loadImage();
+
+            const video = videoLoadComponent.$refs.input.files;
             if (video.length > 0)
                 loadVideo();
 
-            function loadImage() {
+            async function loadImage() {
                 const data = new FormData();
                 data.append('image', image[0]);
-                axios.post(`${import.meta.env.VITE_API_LINK}image`, data);
+                await axios.post(`${import.meta.env.VITE_API_LINK}image`, data);
             }
-            function loadVideo() {
-                const data = new FormData();
-                data.append('video', video[0]);
-                console.log(video[0]);
-                axios.post(`${import.meta.env.VITE_API_LINK}video`, data);
+            async function loadVideo() {
+                const resumable = new Resumable({
+                    target: `${import.meta.env.VITE_API_LINK}video-upload`,
+                    fileType: ['mp4'],
+                    headers: {
+                        'X-XSRF-TOKEN': Cookie.get('XSRF-TOKEN'),
+                        'Accept': 'application/json'
+                    },
+                    withCredentials: true,
+                    throttleProgressCallbacks: 1,
+                    testChunks: false,
+                    setChunkTypeFromFile: true
+                });
+
+                resumable.on('fileAdded', (file) => {
+                    file.resumableObj.upload();
+                });
+
+                resumable.on('fileProgress', (file) => {
+                    self.videoLoadProgress = Math.round(file.progress() * 100);
+                });
+
+                resumable.on('fileSuccess', () => {
+                    self.videoLoadProgress = 0;
+                });
+
+                resumable.addFile(video[0]);
             }
         }
     }

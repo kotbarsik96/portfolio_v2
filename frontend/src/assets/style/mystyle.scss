@@ -189,3 +189,39 @@
     }
 }
 /* <QR-CODE>======================================================================================= */
+
+/* <LOADING-SCALE>================================================================================= */
+.loading-scale {
+    --border_radius: 20px;
+
+    position: relative;
+    margin-top: 20px;
+    width: 100%;
+    height: 20px;
+    background-color: var(--dark);
+    border-radius: var(--border_radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &__progressbar{
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 50%;
+        border-radius: var(--border_radius);
+        background-color: var(--color_2);
+        transition: width .3s;
+        z-index: 5;
+    }
+
+    &__percentage{
+        font-weight: 500;
+        position: relative;
+        font-size: 16px;
+        color: #000;
+        z-index: 10;
+    }
+}
+/* <LOADING-SCALE>================================================================================= */
