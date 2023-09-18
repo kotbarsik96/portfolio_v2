@@ -1,12 +1,13 @@
 <template>
-    <div class="loading" :class="{ 'loading--absolute': isAbsolute }"></div>
+    <div class="loading" :class="{ 'loading--absolute': isAbsolute, 'loading--fixed': isFixed }"></div>
 </template>
 
 <script>
 export default {
     name: 'MyLoading',
     props: {
-        isAbsolute: Boolean
+        isAbsolute: Boolean,
+        isFixed: Boolean
     }
 }
 </script>

@@ -9,7 +9,8 @@ export const useMyStore = defineStore("myStore", {
         return {
             theme: localStorage.getItem("kb96_portfolio_theme") || "light",
             isMe: false,
-            qrCode: null
+            qrCode: null,
+            isLoading: false
         }
     },
     actions: {

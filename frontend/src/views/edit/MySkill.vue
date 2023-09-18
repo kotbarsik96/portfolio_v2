@@ -68,24 +68,16 @@ export default {
         },
         async load() {
             const self = this;
-            const imageLoadComponent = this.$refs.imageLoadComponent;
+            
             const videoLoadComponent = this.$refs.videoLoadComponent;
             if (!imageLoadComponent || !videoLoadComponent)
                 return;
 
-            const image = imageLoadComponent.$refs.input.files;
-            if (image.length > 0)
-                loadImage();
 
             const video = videoLoadComponent.$refs.input.files;
             if (video.length > 0)
                 loadVideo();
 
-            async function loadImage() {
-                const data = new FormData();
-                data.append('image', image[0]);
-                await axios.post(`${import.meta.env.VITE_API_LINK}image`, data);
-            }
             async function loadVideo() {
                 const resumable = new Resumable({
                     target: `${import.meta.env.VITE_API_LINK}video-upload`,

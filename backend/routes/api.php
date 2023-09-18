@@ -34,22 +34,22 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // works
     Route::post('/work', [WorksController::class, 'store']);
-    Route::put('/work/{id}', [WorksController::class, 'update']);
+    Route::post('/work/{id}', [WorksController::class, 'update']);
     Route::delete('/work/{id}', [WorksController::class, 'destroy']);
 
     // skills
     Route::post('/skill', [SkillsController::class, 'store']);
-    Route::put('/skill/{id}', [SkillsController::class, 'update']);
+    Route::post('/skill/{id}', [SkillsController::class, 'update']);
     Route::delete('/skill/{id}', [SkillsController::class, 'destroy']);
 
     // images
     Route::post('/image', [ImagesController::class, 'store']);
-    Route::put('/image/{id}', [ImagesController::class, 'update']);
+    Route::post('/image/{id}', [ImagesController::class, 'update']);
     Route::delete('/image/{id}', [ImagesController::class, 'destroy']);
 
     // video
     Route::post('/video', [VideoController::class, 'store']);
-    Route::put('/video/{id}', [VideoController::class, 'update']);
+    Route::post('/video/{id}', [VideoController::class, 'update']);
     Route::delete('/video/{id}', [VideoController::class, 'destroy']);
     Route::post('/video-upload', [VideoController::class, 'upload']);
 });

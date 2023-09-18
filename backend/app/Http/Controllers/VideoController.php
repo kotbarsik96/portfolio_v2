@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Storage;
 use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
 use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 use Pion\Laravel\ChunkUpload\Exceptions\UploadMissingFileException;
-use Owenoj\LaravelGetId3\GetId3;
 
 class VideoController extends Controller
 {
@@ -42,6 +41,7 @@ class VideoController extends Controller
         $file->move(public_path($this->storeFolderName), $filename);
 
         // return Video::create([
+        //     'original_name' => $file->getClientOriginalName(),
         //     'path' => public_path($this->storeFolderName . '/' . $filename),
         //     'size' => $file->getSize() / 1024,
         //     'width' => $file->width(),

@@ -30,6 +30,7 @@
     --modal_border_radius_1: 30px;
     --modal_border_radius_2: 5px;
 }
+
 /* <СТИЛИ>======================================================================================= */
 label {
     cursor: pointer;
@@ -78,6 +79,7 @@ label {
         margin-bottom: 0;
     }
 }
+
 /* <ANIMATIONS, TRANSITIONS>===================================================================== */
 
 // shrink
@@ -124,6 +126,7 @@ label {
 .scale-up-leave-from {
     transform: scale(1);
 }
+
 /* <ANIMATIONS, TRANSITIONS>===================================================================== */
 
 /* <UI>========================================================================================== */
@@ -131,8 +134,7 @@ label {
 // modal
 .modal {
     color: var(--text_color_modals);
-    border-radius: var(--modal_border_radius_1) var(--modal_border_radius_2) var(--modal_border_radius_1)
-        var(--modal_border_radius_2);
+    border-radius: var(--modal_border_radius_1) var(--modal_border_radius_2) var(--modal_border_radius_1) var(--modal_border_radius_2);
     background-color: var(--main_color);
     transition-property: background-color;
     transition-duration: 0.3s;
@@ -199,6 +201,14 @@ label {
         background: rgba(0, 0, 0, 0.25);
     }
 
+    &--fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 888;
+        background: rgba(0, 0, 0, 0.25);
+    }
+
     &::before,
     &::after {
         content: "";
@@ -215,6 +225,7 @@ label {
         height: 100px;
         animation: loading_spinner 2s linear infinite;
     }
+
     &::after {
         width: 60px;
         height: 60px;
@@ -229,6 +240,7 @@ label {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
@@ -238,10 +250,12 @@ label {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(-360deg);
     }
 }
+
 /* <LOADING>===================================================================================== */
 
 /* <CHECKBOX-LABEL>===============================================================================*/
@@ -284,7 +298,7 @@ label {
         }
     }
 
-    input:checked + &__box {
+    input:checked+&__box {
         border-color: var(--action_color);
 
         &::before {
@@ -292,7 +306,7 @@ label {
         }
     }
 
-    input:checked + * + &__text {
+    input:checked+*+&__text {
         color: var(--action_color);
     }
 
@@ -302,6 +316,7 @@ label {
         transition-duration: var(--trans_dur);
     }
 }
+
 /* <CHECKBOX-LABEL>===============================================================================*/
 
 /* <LIST>======================================================================================== */
@@ -348,6 +363,7 @@ label {
         }
     }
 }
+
 /* <LIST>======================================================================================== */
 
 /* <INPUTS>====================================================================================== */
@@ -364,7 +380,7 @@ label {
         color: #4f4f4f;
     }
 
-    &__icon + &__input {
+    &__icon+&__input {
         padding: 0 40px 0 60px;
     }
 
@@ -387,9 +403,11 @@ label {
 
 .input-item {
     max-width: 700px;
+
     &:not(:last-child) {
         margin-bottom: 20px;
     }
+
     &--full {
         width: 100%;
     }
@@ -400,6 +418,7 @@ label {
         font-size: 24px;
     }
 }
+
 /* <INPUTS>====================================================================================== */
 
 /* <EMPTY>======================================================================================= */
@@ -423,6 +442,7 @@ label {
         line-height: 1.25;
     }
 }
+
 /* <EMPTY>======================================================================================= */
 
 /* <VIDEO>======================================================================================= */
@@ -480,6 +500,7 @@ label {
     &__play-button,
     &__pause-button {
         color: var(--video_controls_color);
+
         &::before {
             font-size: 50px;
         }
@@ -546,6 +567,7 @@ label {
         height: var(--toddler_size);
     }
 }
+
 /* <VIDEO>======================================================================================= */
 
 /* <MEDIA-MODAL-WINDOW>========================================================================== */
@@ -562,6 +584,7 @@ label {
     align-items: center;
     justify-content: center;
 }
+
 /* <MEDIA-MODAL-WINDOW>========================================================================== */
 
 /* <HEADER>====================================================================================== */
@@ -738,9 +761,11 @@ label {
             &-item:nth-child(1) {
                 top: 0;
             }
+
             &-item:nth-child(2) {
                 top: 50%;
             }
+
             &-item:nth-child(3) {
                 top: 100%;
             }
@@ -749,9 +774,11 @@ label {
                 top: 50%;
                 transform: rotate(45deg);
             }
+
             &.__active &-item:nth-child(2) {
                 opacity: 0;
             }
+
             &.__active &-item:nth-child(3) {
                 top: 50%;
                 transform: rotate(-45deg);
@@ -774,7 +801,7 @@ label {
             transition-delay: 0s, 0.3s;
         }
 
-        &__nav-button.__active + &__nav-list {
+        &__nav-button.__active+&__nav-list {
             opacity: 1;
             visibility: visible;
             transition-delay: 0s;
@@ -785,6 +812,7 @@ label {
         }
     }
 }
+
 /* <HEADER>====================================================================================== */
 
 /* <PORTFOLIO>=================================================================================== */
@@ -888,9 +916,11 @@ label {
         margin-right: 10px;
         font-size: 24px;
         color: var(--text_color);
+
         &:last-child {
             margin-right: 0;
             padding-right: 0;
+
             &::after {
                 content: "";
                 margin-left: 0;
@@ -916,6 +946,7 @@ label {
             transform: translate(0, -4px);
         }
     }
+
     &__button.icon-pencil {
         font-size: 21px;
         transform: translateY(-2px);
@@ -1082,6 +1113,7 @@ label {
         }
     }
 }
+
 /* <PORTFOLIO>=================================================================================== */
 
 /* <FILTER>====================================================================================== */
@@ -1176,6 +1208,7 @@ label {
         }
     }
 }
+
 /* <FILTER>====================================================================================== */
 
 /* <ABOUT ME>==================================================================================== */
@@ -1237,6 +1270,7 @@ label {
         }
     }
 }
+
 /* <ABOUT ME>==================================================================================== */
 
 /* <SKILLS>====================================================================================== */
@@ -1312,9 +1346,11 @@ label {
         margin-right: 10px;
         font-size: 24px;
         color: var(--text_color);
+
         &:last-child {
             margin-right: 0;
             padding-right: 0;
+
             &::after {
                 content: "";
                 margin-left: 0;
@@ -1411,6 +1447,7 @@ label {
         align-items: center;
         font-size: 18px;
         color: #4f4f4f;
+
         &.__shown {
             transition-delay: 0s;
             opacity: 1;
@@ -1518,6 +1555,7 @@ label {
         }
     }
 }
+
 /* <SKILLS>====================================================================================== */
 
 /* <HELLO-FORM>================================================================================== */
@@ -1529,6 +1567,7 @@ label {
     justify-content: center;
     min-height: 70vh;
 }
+
 /* <HELLO-FORM>================================================================================== */
 
 /* <SELECT>====================================================================================== */
@@ -1541,8 +1580,7 @@ label {
     z-index: 50;
     font-size: 24px;
     border: 1px solid var(--text_color_modals);
-    border-radius: var(--modal_border_radius_1) var(--modal_border_radius_2) var(--modal_border_radius_1)
-        var(--modal_border_radius_2);
+    border-radius: var(--modal_border_radius_1) var(--modal_border_radius_2) var(--modal_border_radius_1) var(--modal_border_radius_2);
     background-color: var(--main_color);
     transition-property: box-shadow, border-radius;
     transition-duration: var(--trans_dur);
@@ -1596,15 +1634,18 @@ label {
         &:first-child {
             border-top: 1px solid var(--text_color_modals);
         }
+
         &:last-child {
             border-bottom-width: 0;
         }
+
         &:hover {
             color: #cacaca;
             background-color: var(--action_color);
         }
     }
 }
+
 /* <SELECT>====================================================================================== */
 
 /* <MODAL-WINDOW>================================================================================ */
@@ -1624,8 +1665,7 @@ label {
 .modal-window {
     position: relative;
     max-width: 700px;
-    border-radius: var(--modal_border_radius_1) var(--modal_border_radius_2) var(--modal_border_radius_1)
-        var(--modal_border_radius_2);
+    border-radius: var(--modal_border_radius_1) var(--modal_border_radius_2) var(--modal_border_radius_1) var(--modal_border_radius_2);
     background-color: var(--main_color);
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
     padding: 15px 40px;
@@ -1669,6 +1709,7 @@ label {
             &:hover {
                 background-color: var(--action_color);
             }
+
             &--color-2 {
                 background-color: var(--cancel_color);
             }

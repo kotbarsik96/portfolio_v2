@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Image as ImageModel;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image as ImageIntervention;
+use Illuminate\Support\Facades\File;
 
 class ImagesController extends Controller
 {
@@ -17,7 +18,7 @@ class ImagesController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function uploadToFolder(Request $request)
     {
         $this->validateRequest($request);
         $image = $request->file('image');
@@ -28,24 +29,35 @@ class ImagesController extends Controller
         $imageHeight = $imageData->height();
         $imageWidth = $imageData->width();
         $path = $this->storeFolderName . '/' . $imgName;
-        return ImageModel::create([
+
+        return [
             'path' => $path,
-            'size' => $imageData->filesize() / 1024, // кб
+            'original_name' => $image->getClientOriginalName(),
+            'size' => $imageData->filesize() / 1024,
             'width' => $imageWidth,
             'height' => $imageHeight,
-        ]);
+        ];
+    }
+
+    public function store(Request $request)
+    {
+        $fields = $this->uploadToFolder($request);
+        return ImageModel::create($fields);
     }
 
     public function update(Request $request, $id)
     {
-        $fields = $this->validateRequest($request);
-
         $image = ImageModel::find($id);
         if (!$image)
             return response(['error' => true]);
 
-        $image->update($this->createOrUpdateValues($fields));
-        return $image;
+        $path = public_path($image->path);
+        File::delete($path);
+
+        $fields = $this->uploadToFolder($request);
+
+        $image->update($fields);
+        return response($image);
     }
 
     public function destroy($id)
@@ -53,6 +65,9 @@ class ImagesController extends Controller
         $image = ImageModel::find($id);
         if (!$image)
             return response(['not_found' => true]);
+
+        $path = public_path($image->path);
+        File::delete($path);
 
         $image->delete();
         return response(['deleted' => true]);

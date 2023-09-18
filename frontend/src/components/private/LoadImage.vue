@@ -18,6 +18,9 @@
 </template>
 
 <script>
+import { useMyStore } from '@/stores/store.js';
+import axios from 'axios';
+
 export default {
     name: 'LoadImage',
     props: {
@@ -34,9 +37,10 @@ export default {
     },
     data() {
         return {
-            imageWidth: this.width ? parseInt(this.width) : 0,
-            imageHeight: this.height ? parseInt(this.height) : 0,
-            loadedImageSrc: null
+            loadedImageSrc: null,
+            loadedImageId: null,
+            isLoading: false,
+            imageId: null
         }
     },
     methods: {
@@ -54,10 +58,50 @@ export default {
                 this.loadedImageSrc = reader.result;
             };
             reader.readAsDataURL(file);
+
+            this.loadImage();
         },
-        removeImage() {
+        async loadImage() {
+            const self = this;
+            const store = useMyStore();
+            const image = this.$refs.input.files[0];
+            if (!image)
+                return;
+
+            store.isLoading = true;
+            const data = new FormData();
+            data.append('image', image);
+            try {
+                // если к скиллу уже прикреплено изображение, обновить его
+                if (this.imageId) {
+                    const url = `${import.meta.env.VITE_API_LINK}image/${this.imageId}`;
+                    const res = await axios.post(url, data);
+                    if (res.data.error)
+                        await uploadNew();
+                }
+                // если у скилла еще нет изображения, добавить
+                else
+                    await uploadNew();
+            } catch (err) { }
+
+            store.isLoading = false;
+
+            async function uploadNew() {
+                const res = await axios.post(`${import.meta.env.VITE_API_LINK}image`, data);
+                if (res.data && res.data.id) {
+                    self.imageId = res.data.id;
+                }
+                return res;
+            } 
+        },
+        async removeImage() {
             this.loadedImageSrc = null;
             this.$refs.input.files = new DataTransfer().files;
+
+            if (!this.imageId)
+                return;
+
+            axios.delete(`${import.meta.env.VITE_API_LINK}image/${this.imageId}`);
         }
     }
 }

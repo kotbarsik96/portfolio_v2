@@ -17,6 +17,10 @@
             </div>
         </Transition>
 
+        <Transition name="fade-in">
+            <MyLoading v-if="isLoading" isFixed></MyLoading>
+        </Transition>
+
         <RouterView />
     </div>
 </template>
@@ -74,7 +78,8 @@ export default {
         }
     },
     computed: {
-        ...mapState(useModalsStore, ['modalWindows'])
+        ...mapState(useModalsStore, ['modalWindows']),
+        ...mapState(useMyStore, ['isLoading']),
     },
     methods: {
         setThemeClassname() {
