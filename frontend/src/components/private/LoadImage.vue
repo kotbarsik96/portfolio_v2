@@ -36,13 +36,14 @@ export default {
         },
         modelValue: [String, Number]
     },
-    emits: ['update:modelValue'],
+    emits: ['update:modelValue', 'update:isUploading'],
     data() {
         return {
             loadedImageSrc: null,
             loadedImageId: null,
             isLoading: false,
-            imageId: null
+            imageId: null,
+            isUploading: false
         }
     },
     methods: {
@@ -64,12 +65,12 @@ export default {
             this.loadImage();
         },
         async loadImage() {
-            const store = useMyStore();
+
             const image = this.$refs.input.files[0];
             if (!image)
                 return;
 
-            store.isLoading = true;
+            this.isUploading = true;
             const data = new FormData();
             data.append('image', image);
             try {
@@ -88,8 +89,7 @@ export default {
                 }
             } catch (err) { }
 
-            console.log(store);
-            store.isLoading = false;
+            this.isUploading = false;
         },
         async removeImage() {
             this.loadedImageSrc = null;
@@ -107,6 +107,10 @@ export default {
         imageId() {
             this.$emit('update:modelValue', this.imageId);
         },
+        isUploading() {
+            useMyStore().isLoading = this.isUploading;
+            this.$emit('update:isUploading', this.isUploading);
+        }
     }
 }
 </script>

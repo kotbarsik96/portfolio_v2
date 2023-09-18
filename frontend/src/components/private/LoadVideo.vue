@@ -44,7 +44,7 @@ export default {
         modelValue: [String, Number], // id видео из БД
         src: String
     },
-    emits: ['update:modelValue'],
+    emits: ['update:modelValue', 'update:isUploading'],
     data() {
         return {
             imageWidth: this.width ? parseInt(this.width) : 0,
@@ -52,7 +52,8 @@ export default {
             videoSrc: this.src,
             videoLoadProgress: 0,
             videoId: null,
-            resumable: null
+            resumable: null,
+            isUploading: false
         }
     },
     mounted() {
@@ -78,11 +79,16 @@ export default {
 
             this.resumable.on('fileAdded', (file) => {
                 this.resumable.opts.query.videoId = this.videoId;
+                this.isUploading = true;
                 file.resumableObj.upload();
             });
 
             this.resumable.on('fileProgress', (file) => {
                 this.videoLoadProgress = Math.round(file.progress() * 100);
+            });
+
+            this.resumable.on('fileError', () => {
+                this.isUploading = false;
             });
 
             this.resumable.on('fileSuccess', (file, message) => {
@@ -96,6 +102,7 @@ export default {
                     throw new Error(err);
                 }
 
+                this.isUploading = false;
                 this.resumable.removeFile(file);
             });
         },
@@ -124,6 +131,9 @@ export default {
         videoId() {
             this.$emit('update:modelValue', this.videoId);
         },
+        isUploading(){
+            this.$emit('update:isUploading', this.isUploading);
+        }
     }
 }
 </script>
