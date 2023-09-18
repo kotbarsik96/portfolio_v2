@@ -1,3 +1,5 @@
+<!-- СДЕЛАТЬ ТАК, ЧТОБЫ LoadVideo и LoadImage загружали сразу на сервер медиа. При этом, при удалении из навыка, медиа также нужно удалить с сервера. -->
+
 <template>
     <div class="load-media">
         <div class="load-media__title" @click="openExplorer">
