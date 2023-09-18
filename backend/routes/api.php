@@ -27,6 +27,7 @@ Route::post('/logout', [AuthController::class, 'logout']);
 
 Route::get('/works', [WorksController::class, 'show']);
 Route::get('/skills', [SkillsController::class, 'show']);
+Route::get('/video', [VideoController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     // test if user authorized
@@ -48,8 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/image/{id}', [ImagesController::class, 'destroy']);
 
     // video
-    Route::post('/video', [VideoController::class, 'store']);
+    Route::post('/video-upload', [VideoController::class, 'upload']);
     Route::post('/video/{id}', [VideoController::class, 'update']);
     Route::delete('/video/{id}', [VideoController::class, 'destroy']);
-    Route::post('/video-upload', [VideoController::class, 'upload']);
 });

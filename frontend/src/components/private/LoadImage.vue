@@ -33,8 +33,10 @@ export default {
         title: {
             type: String,
             default: 'Загрузка изображения'
-        }
+        },
+        modelValue: [String, Number]
     },
+    emits: ['update:modelValue'],
     data() {
         return {
             loadedImageSrc: null,
@@ -62,7 +64,6 @@ export default {
             this.loadImage();
         },
         async loadImage() {
-            const self = this;
             const store = useMyStore();
             const image = this.$refs.input.files[0];
             if (!image)
@@ -76,23 +77,19 @@ export default {
                 if (this.imageId) {
                     const url = `${import.meta.env.VITE_API_LINK}image/${this.imageId}`;
                     const res = await axios.post(url, data);
-                    if (res.data.error)
-                        await uploadNew();
+                    if (res.data.id)
+                        this.imageId = res.data.id;
                 }
                 // если у скилла еще нет изображения, добавить
-                else
-                    await uploadNew();
+                else {
+                    const res = await axios.post(`${import.meta.env.VITE_API_LINK}image`, data);
+                    if (res.data && res.data.id)
+                        this.imageId = res.data.id;
+                }
             } catch (err) { }
 
+            console.log(store);
             store.isLoading = false;
-
-            async function uploadNew() {
-                const res = await axios.post(`${import.meta.env.VITE_API_LINK}image`, data);
-                if (res.data && res.data.id) {
-                    self.imageId = res.data.id;
-                }
-                return res;
-            } 
         },
         async removeImage() {
             this.loadedImageSrc = null;
@@ -101,8 +98,15 @@ export default {
             if (!this.imageId)
                 return;
 
-            axios.delete(`${import.meta.env.VITE_API_LINK}image/${this.imageId}`);
+            await axios.delete(`${import.meta.env.VITE_API_LINK}image/${this.imageId}`);
+
+            this.imageId = null;
         }
+    },
+    watch: {
+        imageId() {
+            this.$emit('update:modelValue', this.imageId);
+        },
     }
 }
 </script>

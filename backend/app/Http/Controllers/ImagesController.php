@@ -22,7 +22,7 @@ class ImagesController extends Controller
     {
         $this->validateRequest($request);
         $image = $request->file('image');
-        $imgName = time() . '.' . $image->extension();
+        $imgName = md5(time()) . '.' . $image->extension();
         $image->move(public_path($this->storeFolderName), $imgName);
 
         $imageData = ImageIntervention::make(public_path($this->storeFolderName) . '/' . $imgName);
@@ -49,7 +49,7 @@ class ImagesController extends Controller
     {
         $image = ImageModel::find($id);
         if (!$image)
-            return response(['error' => true]);
+            return $this->store($request);
 
         $path = public_path($image->path);
         File::delete($path);

@@ -11,6 +11,7 @@ import TextInput from './components/global/TextInput.vue'
 import InputItem from './components/global/InputItem.vue'
 import MySelect from './components/global/MySelect.vue'
 import MyLoading from './components/global/MyLoading.vue'
+import ProgressBar from './components/private/ProgressBar.vue'
 
 const app = createApp(App)
     .component('MyHeader', MyHeader)
@@ -19,6 +20,7 @@ const app = createApp(App)
     .component('InputItem', InputItem)
     .component('MySelect', MySelect)
     .component('MyLoading', MyLoading)
+    .component('ProgressBar', ProgressBar)
 
 app.use(createPinia())
 app.use(router)
