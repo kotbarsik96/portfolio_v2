@@ -34,6 +34,7 @@ export default {
             type: String,
             default: 'Загрузка изображения'
         },
+        placeholderData: Object,
         modelValue: [String, Number]
     },
     emits: ['update:modelValue', 'update:isUploading'],
@@ -47,6 +48,15 @@ export default {
         }
     },
     methods: {
+        async loadImageData() {
+            if (this.placeholderData) {
+                this.loadedImageId = this.placeholderData.id;
+                this.loadedImageSrc = `${import.meta.env.VITE_BACKEND_LINK}${this.placeholderData.path}`;
+            } else {
+                this.loadedImageId = null;
+                this.loadedImageSrc = null;
+            }
+        },
         openExplorer() {
             this.$refs.input.click();
         },
@@ -65,7 +75,6 @@ export default {
             this.loadImage();
         },
         async loadImage() {
-
             const image = this.$refs.input.files[0];
             if (!image)
                 return;
@@ -110,6 +119,9 @@ export default {
         isUploading() {
             useMyStore().isLoading = this.isUploading;
             this.$emit('update:isUploading', this.isUploading);
+        },
+        placeholderData() {
+            this.loadImageData();
         }
     }
 }

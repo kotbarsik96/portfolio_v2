@@ -10,10 +10,7 @@
                 </div>
                 <div class="skills__list-container">
                     <ul v-if="items.length > 0" class="skills__list">
-                        <SkillItem></SkillItem>
-                        <SkillItem></SkillItem>
-                        <SkillItem></SkillItem>
-                        <SkillItem></SkillItem>
+                        <SkillItem v-for="item in items" :key="item.id" :data="item"></SkillItem>
                     </ul>
                     <div v-else class="empty">
                         <img :src="emptyIcon" alt="" class="empty__icon">
@@ -39,6 +36,7 @@
 import MySearch from '../MySearch.vue';
 import SkillItem from '../SkillItem.vue';
 import emptyIcon from '@/assets/images/icons/cricket.svg';
+import axios from 'axios';
 
 export default {
     name: 'MySkills',
@@ -46,10 +44,19 @@ export default {
         MySearch,
         SkillItem
     },
-    data(){
+    data() {
         return {
             emptyIcon,
-            items: ['']
+            items: [],
+        }
+    },
+    mounted() {
+        this.loadItems();
+    },
+    methods: {
+        async loadItems() {
+            const res = await axios.get(`${import.meta.env.VITE_API_LINK}skills`);
+            this.items = res.data;
         }
     }
 }

@@ -2,52 +2,67 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Skills;
 use Illuminate\Http\Request;
+use App\Models\Skill;
+use App\Models\Video;
+use App\Models\Image;
 
 class SkillsController extends Controller
 {
-    public function validateRequest(Request $request)
+    public function all()
     {
-        return $request->validate([
-            'title' => 'required|min:2|string|unique:App\Models\Skills,title',
-            'image_id' => 'numeric',
-            'video_id' => 'numeric',
-        ]);
+        return Skill::all();
     }
 
-    public function createOrUpdateValues($fields)
+    public function single($id)
     {
-        return [
-            'title' => e($fields['title']),
-            'image_id' => is_numeric($fields['image_id']) ? intval($fields['image_id']) : null,
-            'video_id' => is_numeric($fields['video_id']) ? intval($fields['video_id']) : null
-        ];
+        $skill = Skill::find($id);
+        if (!$skill)
+            return response(['not_found' => true]);
+
+        if (is_numeric($skill->video_id))
+            $skill->video = Video::find($skill->video_id);
+        if (is_numeric($skill->image_id))
+            $skill->image = Image::find($skill->image_id);
+
+        return response($skill);
+    }
+
+    public function validateFields(Request $request)
+    {
+        return $request->validate([
+            'title' => 'required|min:3|string',
+            'image_id' => 'nullable|numeric',
+            'video_id' => 'nullable|numeric'
+        ]);
     }
 
     public function store(Request $request)
     {
-        $fields = $this->validateRequest($request);
+        $fields = $this->validateFields($request);
 
-        return Skills::create($this->createOrUpdateValue($fields));
+        return Skill::create($fields);
     }
 
     public function update(Request $request, $id)
     {
-        $fields = $this->validateRequest($request);
+        $fields = $this->validateFields($request);
 
-        $skill = Skills::find($id);
-        if (!$skill)
-            return response(['error' => true]);
+        $skill = Skill::find($id);
 
-        $skill->update($this->createOrUpdateValues($fields));
-        return $skill;
+        if ($skill) {
+            $skill->update($fields);
+            return $skill;
+        }
+
+        return Skill::create($fields);
     }
 
     public function destroy($id)
     {
-        $skill = Skills::find($id);
-        if (!$skill)
+        \Illuminate\Support\Facades\Log::info($id);
+        $skill = Skill::find($id);
+        if(!$skill)
             return response(['not_found' => true]);
 
         $skill->delete();

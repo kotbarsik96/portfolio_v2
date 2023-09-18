@@ -42,13 +42,12 @@ export default {
             default: 'Загрузка видео'
         },
         modelValue: [String, Number], // id видео из БД
+        placeholderData: Object,
         src: String
     },
     emits: ['update:modelValue', 'update:isUploading'],
     data() {
         return {
-            imageWidth: this.width ? parseInt(this.width) : 0,
-            imageHeight: this.height ? parseInt(this.height) : 0,
             videoSrc: this.src,
             videoLoadProgress: 0,
             videoId: null,
@@ -60,6 +59,15 @@ export default {
         this.initResumable();
     },
     methods: {
+        async loadVideoData() {
+            if (this.placeholderData) {
+                this.videoId = this.placeholderData.id;
+                this.videoSrc = `${import.meta.env.VITE_BACKEND_LINK}${this.placeholderData.path}`;
+            } else {
+                this.videoId = null;
+                this.videoSrc = null;
+            }
+        },
         initResumable() {
             this.resumable = new Resumable({
                 target: `${import.meta.env.VITE_API_LINK}video-upload`,
@@ -131,8 +139,11 @@ export default {
         videoId() {
             this.$emit('update:modelValue', this.videoId);
         },
-        isUploading(){
+        isUploading() {
             this.$emit('update:isUploading', this.isUploading);
+        },
+        placeholderData() {
+            this.loadVideoData();
         }
     }
 }

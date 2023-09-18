@@ -25,8 +25,9 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/doubleauth', [AuthController::class, 'validate2fa']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
-Route::get('/works', [WorksController::class, 'show']);
-Route::get('/skills', [SkillsController::class, 'show']);
+Route::get('/skills', [SkillsController::class, 'all']);
+Route::get('/skill/{id}', [SkillsController::class, 'single']);
+
 Route::get('/video', [VideoController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {

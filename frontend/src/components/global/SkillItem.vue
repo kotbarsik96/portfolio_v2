@@ -7,8 +7,8 @@
                 @click="toggleLinks"></button>
             <button class="skill-item__button icon-video" :class="{ '__active': mediaType === 'video' }" type="button"
                 @click="changeMedia('video')"></button>
-            <!-- <RouterLink v-if="isMe" class="skill-item__button icon-pencil" :to="{ name: 'EditSkill', params: { id: data.id } }">
-            </RouterLink> -->
+            <RouterLink v-if="isMe" class="skill-item__button icon-pencil" :to="{ name: 'EditSkill', params: { id: data.id } }">
+            </RouterLink>
         </div>
         <div class="skill-item__container" ref="itemContainer">
             <div class="skill-item__folder-back" :style="{ backgroundImage: folderBackgroundBack }">
@@ -61,10 +61,10 @@ export default {
         VideoPlayer
     },
     props: {
-        // data: {
-        //     type: Object,
-        //     required: true
-        // }
+        data: {
+            type: Object,
+            required: true
+        }
     },
     mounted() {
         const store = useMyStore();

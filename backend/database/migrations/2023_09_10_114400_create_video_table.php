@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string('path');
             $table->integer('width');
             $table->integer('height');
-            $table->string('size');
+            $table->integer('size');
             $table->integer('duration');
             $table->timestamps();
         });

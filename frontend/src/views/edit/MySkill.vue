@@ -4,24 +4,25 @@
             {{ $route.meta.isEditing ? 'Редактирование' : 'Добавление' }}
             навыка
         </h3>
-        <div class="add">
+        <div class="add" ref="form">
             <div class="add__inputs-section">
-                <InputItem class="input-item--full" label="Название" placeholder="Название" id="skill-title"
-                    name="skill_title"></InputItem>
+                <InputItem class="input-item--full" label="Название" placeholder="Название" id="skill-title" name="title"
+                    :value="title">
+                </InputItem>
             </div>
             <div class="add__load-media">
                 <div class="add__load-media-item">
-                    <LoadImage title="Изображение" ref="imageLoadComponent" v-model="imageId"
+                    <LoadImage title="Изображение" ref="imageLoadComponent" :placeholderData="imageData" v-model="imageId"
                         v-model:isUploading="isUploadingImage"></LoadImage>
                 </div>
                 <div class="add__load-media-item">
-                    <LoadVideo title="Видео" ref="videoLoadComponent" v-model="videoId"
+                    <LoadVideo title="Видео" ref="videoLoadComponent" :placeholderData="videoData" v-model="videoId"
                         v-model:isUploading="isUploadingVideo"></LoadVideo>
                 </div>
             </div>
             <div class="add__buttons">
                 <button v-if="$route.meta.isEditing" class="button button--color_2" type="button" @click="update">
-                    Редактировать
+                    Сохранить
                 </button>
                 <button v-if="$route.meta.isEditing" class="button" type="button" @click="remove">
                     Удалить
@@ -38,6 +39,8 @@
 import LoadImage from '@/components/private/LoadImage.vue';
 import LoadVideo from '@/components/private/LoadVideo.vue';
 import { useMyStore } from '@/stores/store.js';
+import axios from 'axios';
+import { getDataFromForms } from '@/assets/scripts/scripts.js';
 
 export default {
     name: 'MySkill',
@@ -50,10 +53,41 @@ export default {
             videoId: null,
             imageId: null,
             isUploadingImage: false,
-            isUploadingVideo: false
+            isUploadingVideo: false,
+            skillData: null,
+            uploadedImageData: null,
+            uploadedVideoData: null
         }
     },
+    async beforeRouteEnter(to, from, next) {
+        next(self => {
+            if (self.$route.params.id)
+                self.getDataById();
+        });
+    },
+    beforeRouteLeave() {
+        this.nullifyAll();
+    },
     methods: {
+        nullifyAll() {
+            this.videoId = null;
+            this.imageId = null;
+            this.isUploadingImage = false;
+            this.isUploadingVideo = false;
+            this.skillData = null;
+            this.uploadedImageData = null;
+            this.uploadedVideoData = null;
+        },
+        async getDataById() {
+            const store = useMyStore();
+            store.isLoading = true;
+
+            const id = this.$route.params.id;
+            const res = await axios.get(`${import.meta.env.VITE_API_LINK}skill/${id}`);
+            this.skillData = res.data;
+
+            store.isLoading = false;
+        },
         // пока загружается изображение или видео, не дает выполнить update()/upload() навыка. Эти методы будут вызваны как только все медиа будут загружены, если они загружаются
         checkIfUploading(methodName = '') {
             if (this.isUploadingImage || this.isUploadingVideo) {
@@ -78,20 +112,80 @@ export default {
 
             return false;
         },
-        async update() {
-            if (this.checkIfUploading('update'))
-                return;
-        },
-        async remove() {
-
+        getDataForUploading() {
+            const data = getDataFromForms(this.$refs.form);
+            data.image_id = this.imageId;
+            data.video_id = this.videoId;
+            return data;
         },
         async load() {
             if (this.checkIfUploading('load'))
                 return;
 
-            
-        }
+            const store = useMyStore();
+            store.isLoading = true;
+
+            const data = this.getDataForUploading();
+            try {
+                const res = await axios.post(`${import.meta.env.VITE_API_LINK}skill`, data);
+                if (res && res.data && res.data.id) {
+                    store.isLoading = false;
+                    this.$router.push({ name: 'EditSkill', params: { id: res.data.id } });
+                }
+            } catch (err) { }
+        },
+        async update() {
+            if (this.checkIfUploading('update'))
+                return;
+
+            const store = useMyStore();
+            store.isLoading = true;
+
+            const data = this.getDataForUploading();
+            try {
+                const url = `${import.meta.env.VITE_API_LINK}skill/${this.skillData.id}`;
+                const res = await axios.post(url, data);
+                if (res && res.data && res.data.id) {
+                    store.isLoading = false;
+                }
+            } catch (err) { }
+        },
+        async remove() {
+            if (!this.skillData)
+                return;
+
+            const store = useMyStore();
+            store.isLoading = true;
+
+            try {
+                const res = await axios.delete(`${import.meta.env.VITE_API_LINK}skill/${this.skillData.id}`);
+                if (res && res.data && res.data.deleted) {
+                    store.isLoading = false;
+                    this.$router.push({ name: 'AddSkill' });
+                }
+            } catch (err) { }
+        },
     },
+    computed: {
+        title() {
+            if (this.skillData && this.skillData.title)
+                return this.skillData.title;
+
+            return null;
+        },
+        imageData() {
+            if (this.skillData && this.skillData.image)
+                return this.skillData.image;
+
+            return null;
+        },
+        videoData() {
+            if (this.skillData && this.skillData.video)
+                return this.skillData.video;
+
+            return null;
+        },
+    }
 }
 </script>
 
