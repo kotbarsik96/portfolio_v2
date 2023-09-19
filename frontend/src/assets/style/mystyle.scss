@@ -116,7 +116,15 @@
 .edit-taxonomy {
 
     &__search-container {
+        margin-bottom: 20px;
+    }
+
+    &__new-input{
         margin-bottom: 60px;
+
+        .text-input {
+            margin-bottom: 20px;
+        }
     }
 
     &__list-item {

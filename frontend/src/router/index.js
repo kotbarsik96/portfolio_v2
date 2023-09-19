@@ -53,9 +53,10 @@ const router = createRouter({
                     name: 'MyTypes',
                     component: () => import('@/views/edit/MyTaxonomies.vue'),
                     meta: {
-                        taxonomyTitle: 'тип',
-                        taxonomyTitleGenitive: 'типа',
-                        taxonomyName: 'type'
+                        title: 'Тип',
+                        titleGenitive: 'типа',
+                        titleNew: 'Добавить тип',
+                        taxonomyTitle: 'type'
                     }
                 },
                 {
@@ -63,9 +64,21 @@ const router = createRouter({
                     name: 'MyStack',
                     component: () => import('@/views/edit/MyTaxonomies.vue'),
                     meta: {
-                        taxonomyTitle: 'стек',
-                        taxonomyTitleGenitive: 'стека',
-                        taxonomyName: 'stack'
+                        title: 'Стек',
+                        titleGenitive: 'стека',
+                        titleNew: 'Добавить стек',
+                        taxonomyTitle: 'stack'
+                    }
+                },
+                {
+                    path: 'add-tag',
+                    name: 'MyTags',
+                    component: () => import('@/views/edit/MyTaxonomies.vue'),
+                    meta: {
+                        title: 'Тег',
+                        titleGenitive: 'тега',
+                        titleNew: 'Добавить тег',
+                        taxonomyTitle: 'tag'
                     }
                 }
             ]

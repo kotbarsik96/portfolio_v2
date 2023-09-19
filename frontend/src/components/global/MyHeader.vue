@@ -76,6 +76,23 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="header__nav-item" :class="{ '__shown': activeSublist === 'tags' }">
+                        <button class="header__nav-link" type="button" @click="toggleSublist('tags')">
+                            Теги
+                        </button>
+                        <ul class="header__nav-sublist">
+                            <li class="header__nav-subitem">
+                                <RouterLink :to="{ name: 'MyTags' }" class="link header__nav-link">
+                                    Добавить
+                                </RouterLink>
+                            </li>
+                            <li class="header__nav-subitem">
+                                <RouterLink to="/" class="link header__nav-link">
+                                    Изменить
+                                </RouterLink>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
                 <ul v-else class="header__nav-list">
                     <li class="header__nav-item">

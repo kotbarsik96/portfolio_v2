@@ -1,14 +1,14 @@
 <template>
     <li class="edit-taxonomy__list-item">
         <div class="edit-taxonomy__list-value editable" ref="value" @blur="onValueBlur" @input="onInput">
-            {{ tax }}
+            {{ value }}
         </div>
         <button class="edit-taxonomy__button edit-taxonomy__list-edit icon-pencil" type="button"
             @click="onEditClick"></button>
         <button class="edit-taxonomy__button edit-taxonomy__list-remove icon-circle-minus" type="button"
             @click="onRemoveClick">
         </button>
-        <button v-if="savedValue !== initialValue"
+        <button v-if="valueHistory.length > 0"
             class="edit-taxonomy__button edit-taxonomy__list-turn-back icon-turn-back" type="button"
             @click="onTurnBackClick">
         </button>
@@ -24,12 +24,13 @@ export default {
     props: {
         tax: String
     },
-    emits: ['change-tax', 'remove-tax'],
+    emits: ['changeTax', 'removeTax'],
     data() {
         return {
             initialValue: this.tax.slice(0, this.tax.length),
             value: this.tax,
             savedValue: this.tax,
+            valueHistory: []
         }
     },
     methods: {
@@ -42,20 +43,17 @@ export default {
             const valueRef = this.$refs.value;
             valueRef.removeAttribute('contenteditable');
             // save
-            if (this.value) {
-                const oldValue = this.savedValue;
+            if (this.value && this.value !== this.savedValue) {
+                this.valueHistory.push(this.savedValue);
                 this.savedValue = this.value;
-                this.$emit('change-tax', this.savedValue, oldValue);
+                const oldValue = this.valueHistory[this.valueHistory.length - 1];
+                this.$emit('changeTax', this.savedValue, oldValue, this.initialValue);
             }
         },
         onInput() {
             const valueRef = this.$refs.value;
             const textContent = getTextContent(valueRef);
             this.value = textContent;
-            if (this.value.length < 1) {
-                const removeButton = this.$refs.removeButton.find(node => node.parentNode === event.target.parentNode);
-                removeButton.click();
-            }
         },
         onRemoveClick() {
             const modalsStore = useModalsStore();
@@ -70,13 +68,15 @@ export default {
             });
 
             function onConfirm() {
-                self.$emit('remove-tax', self.savedValue);
+                self.$emit('removeTax', self.savedValue);
             }
         },
         onTurnBackClick() {
+            const self = this;
             const modalsStore = useModalsStore();
+            const lastValue = this.valueHistory[this.valueHistory.length - 1];
             modalsStore.addModalWindow({
-                title: `Вернуть исходное название: с "${this.savedValue}" на "${this.initialValue}"?`,
+                title: `Вернуть исходное название: с "${this.savedValue}" на "${lastValue}"?`,
                 confirm: {
                     callback: onConfirm,
                     title: 'Вернуть'
@@ -84,7 +84,9 @@ export default {
             });
 
             function onConfirm() {
-
+                self.value = lastValue;
+                self.onValueBlur();
+                self.valueHistory = self.valueHistory.slice(0, self.valueHistory.length - 2);
             }
         }
     }

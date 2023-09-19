@@ -32,7 +32,13 @@
                 </div>
             </div>
             <div class="add__buttons">
-                <button class="button button--color_2" type="button">
+                <button v-if="$route.meta.isEditing" class="button button--color_2" type="button" @click="update">
+                    Сохранить
+                </button>
+                <button v-if="$route.meta.isEditing" class="button" type="button" @click="remove">
+                    Удалить
+                </button>
+                <button v-else class="button button--color_2" type="button" @click="load">
                     Добавить
                 </button>
             </div>

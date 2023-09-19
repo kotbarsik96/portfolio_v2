@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TaxonomiesController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
@@ -28,7 +29,7 @@ Route::post('/logout', [AuthController::class, 'logout']);
 Route::get('/skills', [SkillsController::class, 'all']);
 Route::get('/skill/{id}', [SkillsController::class, 'single']);
 
-Route::get('/video', [VideoController::class, 'show']);
+Route::get('/taxonomies/{title}', [TaxonomiesController::class, 'all']);
 
 Route::middleware('auth:sanctum')->group(function () {
     // test if user authorized
@@ -53,4 +54,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/video-upload', [VideoController::class, 'upload']);
     Route::post('/video/{id}', [VideoController::class, 'update']);
     Route::delete('/video/{id}', [VideoController::class, 'destroy']);
+
+    // taxonomies
+    Route::post('/taxonomy/{taxonomyTitle}', [TaxonomiesController::class, 'store']);
+    Route::post('/taxonomy/{taxonomyTitle}/{id}', [TaxonomiesController::class, 'update']);
+    Route::post('/taxonomies/{taxonomyTitle}', [TaxonomiesController::class, 'updateSeveral']);
+    Route::delete('/taxonomy/{taxonomyTitle}/{id}', [TaxonomiesController::class, 'destroy']);
 });
