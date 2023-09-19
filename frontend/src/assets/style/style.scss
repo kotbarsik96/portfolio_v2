@@ -657,6 +657,8 @@ label {
 
     &__nav-sublist {
         position: absolute;
+        min-width: 100%;
+        text-align: center;
         top: 100%;
         left: 0;
         background-color: var(--main_color);
@@ -689,6 +691,7 @@ label {
     }
 
     &__nav-link {
+        line-height: 1;
         display: inline-block;
         font-size: 24px;
         color: var(--header_text_color);

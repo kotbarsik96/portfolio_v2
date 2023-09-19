@@ -8,90 +8,42 @@
                     <span class="header__nav-button-item"></span>
                 </button>
                 <ul v-if="$route.meta.isMe" class="header__nav-list">
-                    <li class="header__nav-item" :class="{ '__shown': activeSublist === 'works' }">
-                        <button class="header__nav-link" type="button" @click="toggleSublist('works')">
-                            Работы
-                        </button>
-                        <ul class="header__nav-sublist">
-                            <li class="header__nav-subitem">
-                                <RouterLink :to="{ name: 'AddWork' }" class="link header__nav-link">
-                                    Добавить
-                                </RouterLink>
-                            </li>
-                            <li class="header__nav-subitem">
-                                <RouterLink to="/" class="link header__nav-link">
-                                    Изменить
-                                </RouterLink>
-                            </li>
-                        </ul>
+                    <li class="header__nav-item">
+                        <RouterLink :to="{ name: 'AddWork' }" class="header__nav-link">
+                            Работа
+                        </RouterLink>
                     </li>
-                    <li class="header__nav-item" :class="{ '__shown': activeSublist === 'skills' }">
-                        <button class="header__nav-link" type="button" @click="toggleSublist('skills')">
-                            Навыки
-                        </button>
-                        <ul class="header__nav-sublist">
-                            <li class="header__nav-subitem">
-                                <RouterLink :to="{ name: 'AddSkill' }" class="link header__nav-link">
-                                    Добавить
-                                </RouterLink>
-                            </li>
-                            <li class="header__nav-subitem">
-                                <RouterLink to="/" class="link header__nav-link">
-                                    Изменить
-                                </RouterLink>
-                            </li>
-                        </ul>
+                    <li class="header__nav-item">
+                        <RouterLink :to="{ name: 'AddSkill' }" class="header__nav-link">
+                            Навык
+                        </RouterLink>
                     </li>
-                    <li class="header__nav-item" :class="{ '__shown': activeSublist === 'types' }">
-                        <button class="header__nav-link" type="button" @click="toggleSublist('types')">
-                            Типы
+                    <li class="header__nav-item" :class="{ '__shown': activeSublist === 'taxonomies' }">
+                        <button class="header__nav-link" type="button" @click="toggleSublist('taxonomies')">
+                            Таксономии
                         </button>
                         <ul class="header__nav-sublist">
                             <li class="header__nav-subitem">
                                 <RouterLink :to="{ name: 'MyTypes' }" class="link header__nav-link">
-                                    Добавить
+                                    Тип
                                 </RouterLink>
                             </li>
-                            <li class="header__nav-subitem">
-                                <RouterLink to="/" class="link header__nav-link">
-                                    Изменить
-                                </RouterLink>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="header__nav-item" :class="{ '__shown': activeSublist === 'stack' }">
-                        <button class="header__nav-link" type="button" @click="toggleSublist('stack')">
-                            Стек
-                        </button>
-                        <ul class="header__nav-sublist">
-                            <li class="header__nav-subitem">
-                                <RouterLink :to="{ name: 'MyStack' }" class="link header__nav-link">
-                                    Добавить
-                                </RouterLink>
-                            </li>
-                            <li class="header__nav-subitem">
-                                <RouterLink to="/" class="link header__nav-link">
-                                    Изменить
-                                </RouterLink>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="header__nav-item" :class="{ '__shown': activeSublist === 'tags' }">
-                        <button class="header__nav-link" type="button" @click="toggleSublist('tags')">
-                            Теги
-                        </button>
-                        <ul class="header__nav-sublist">
                             <li class="header__nav-subitem">
                                 <RouterLink :to="{ name: 'MyTags' }" class="link header__nav-link">
-                                    Добавить
+                                    Теги
                                 </RouterLink>
                             </li>
                             <li class="header__nav-subitem">
-                                <RouterLink to="/" class="link header__nav-link">
-                                    Изменить
+                                <RouterLink :to="{ name: 'MyStack' }" class="link header__nav-link">
+                                    Стек
                                 </RouterLink>
                             </li>
                         </ul>
+                    </li>
+                    <li class="header__nav-item">
+                        <RouterLink :to="{ name: 'Home' }" class="header__nav-link header__nav-link--me">
+                            Назад
+                        </RouterLink>
                     </li>
                 </ul>
                 <ul v-else class="header__nav-list">
@@ -132,7 +84,7 @@
                         </RouterLink>
                     </li>
                     <li v-if="isMe && $route.meta.isHome" class="header__nav-item">
-                        <RouterLink to="/me" class="header__nav-link header__nav-link--me">
+                        <RouterLink :to="{ name: 'Me' }" class="header__nav-link header__nav-link--me">
                             КТО Я?
                         </RouterLink>
                     </li>
