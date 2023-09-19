@@ -27,10 +27,22 @@ class SkillsController extends Controller
         if (!$skill)
             return response(['not_found' => true]);
 
-        if (is_numeric($skill->video_id))
-            $skill->video = Video::find($skill->video_id);
-        if (is_numeric($skill->image_id))
-            $skill->image = Image::find($skill->image_id);
+        if (is_numeric($skill->video_id)) {
+            $video = Video::find($skill->video_id);
+            if ($video) {
+                $skill->video = $video;
+            } else {
+                $skill->update(['video_id' => null]);
+            }
+        }
+        if (is_numeric($skill->image_id)) {
+            $image = Image::find($skill->image_id);
+            if ($image) {
+                $skill->image = $image;
+            } else {
+                $skill->update(['image_id' => null]);
+            }
+        }
 
         // сюда добавить $skill->links, в которую сложить данные из таблицы works_skills, предварительно получив только данные о конкретном навыке
 

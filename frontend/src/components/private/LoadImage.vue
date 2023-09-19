@@ -35,7 +35,9 @@ export default {
             default: 'Загрузка изображения'
         },
         placeholderData: Object,
-        modelValue: [String, Number]
+        modelValue: [String, Number],
+        /* указывает подпапку, в которую нужно загрузить видео (по умолчанию загружается в images/, если указать, например, subfolderName: 'skill', будет images/skill) */
+        subfolderName: String
     },
     emits: ['update:modelValue', 'update:isUploading'],
     data() {
@@ -82,6 +84,9 @@ export default {
             this.isUploading = true;
             const data = new FormData();
             data.append('image', image);
+            if (this.subfolderName)
+                data.append('subfolder', this.subfolderName);
+
             try {
                 // если к скиллу уже прикреплено изображение, обновить его
                 if (this.imageId) {

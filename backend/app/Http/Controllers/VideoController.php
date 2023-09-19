@@ -36,7 +36,7 @@ class VideoController extends Controller
             if (!is_numeric($id))
                 $id = null;
 
-            return $this->store($save->getFile(), $id);
+            return $this->store($save->getFile(), $id, $request['subfolder']);
         }
 
         $handler = $save->handler();
@@ -46,13 +46,17 @@ class VideoController extends Controller
         ]);
     }
 
-    public function getFields($file)
+    public function getFields($file, $requestSubfolder = null)
     {
         $filename = $this->getFilename($file);
 
-        $file->move(public_path($this->storeFolderName), $filename);
+        $foldersPath = $this->storeFolderName;
+        if ($requestSubfolder)
+            $foldersPath .= '/' . $requestSubfolder;
+
+        $file->move(public_path($foldersPath), $filename);
         $ffprobe = FFProbe::create();
-        $filepath = public_path($this->storeFolderName) . '/' . $filename;
+        $filepath = public_path($foldersPath) . '/' . $filename;
         $formatted = $ffprobe
             ->format($filepath);
         $videoDimensions = $ffprobe
@@ -63,7 +67,7 @@ class VideoController extends Controller
 
         return [
             'original_name' => $file->getClientOriginalName(),
-            'path' => $this->storeFolderName . '/' . $filename,
+            'path' => $foldersPath . '/' . $filename,
             'size' => intval($formatted->get('size') / 1024),
             'width' => $videoDimensions->getWidth(),
             'height' => $videoDimensions->getHeight(),
@@ -71,9 +75,9 @@ class VideoController extends Controller
         ];
     }
 
-    public function store(UploadedFile $file, $id = null)
+    public function store(UploadedFile $file, $id = null, $requestSubfolder = null)
     {
-        $fields = $this->getFields($file);
+        $fields = $this->getFields($file, $requestSubfolder);
 
         // если нужно обновить существующую запись в БД
         if (is_numeric($id)) {

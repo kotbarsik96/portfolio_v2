@@ -41,9 +41,12 @@ export default {
             type: String,
             default: 'Загрузка видео'
         },
-        modelValue: [String, Number], // id видео из БД
         placeholderData: Object,
-        src: String
+        src: String,
+        /* id видео из БД */
+        modelValue: [String, Number],
+        /* указывает подпапку, в которую нужно загрузить видео (по умолчанию загружается в video/, если указать, например, subfolderName: 'skill', будет video/skill) */
+        subfolderName: String,
     },
     emits: ['update:modelValue', 'update:isUploading'],
     data() {
@@ -69,12 +72,16 @@ export default {
             }
         },
         initResumable() {
+            const query = {
+                videoId: this.videoId
+            };
+            if (this.subfolderName)
+                query.subfolder = this.subfolderName;
+
             this.resumable = new Resumable({
                 target: `${import.meta.env.VITE_API_LINK}video-upload`,
                 fileType: ['mp4'],
-                query: {
-                    videoId: this.videoId
-                },
+                query,
                 headers: {
                     'X-XSRF-TOKEN': Cookie.get('XSRF-TOKEN'),
                     'Accept': 'application/json'

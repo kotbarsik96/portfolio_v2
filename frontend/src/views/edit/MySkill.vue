@@ -12,11 +12,11 @@
             </div>
             <div class="add__load-media">
                 <div class="add__load-media-item">
-                    <LoadImage title="Изображение" ref="imageLoadComponent" :placeholderData="imageData" v-model="imageId"
+                    <LoadImage title="Изображение" ref="imageLoadComponent" subfolderName="skill" :placeholderData="imageData" v-model="imageId"
                         v-model:isUploading="isUploadingImage"></LoadImage>
                 </div>
                 <div class="add__load-media-item">
-                    <LoadVideo title="Видео" ref="videoLoadComponent" :placeholderData="videoData" v-model="videoId"
+                    <LoadVideo title="Видео" ref="videoLoadComponent" subfolderName="skill" :placeholderData="videoData" v-model="videoId"
                         v-model:isUploading="isUploadingVideo"></LoadVideo>
                 </div>
             </div>

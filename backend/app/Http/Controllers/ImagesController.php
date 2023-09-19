@@ -20,15 +20,19 @@ class ImagesController extends Controller
 
     public function uploadToFolder(Request $request)
     {
+        $foldersPath = $this->storeFolderName;
+        if ($request['subfolder'])
+            $foldersPath .= '/' . $request['subfolder'];
+
         $this->validateRequest($request);
         $image = $request->file('image');
         $imgName = md5(time()) . '.' . $image->extension();
-        $image->move(public_path($this->storeFolderName), $imgName);
+        $image->move(public_path($foldersPath), $imgName);
 
-        $imageData = ImageIntervention::make(public_path($this->storeFolderName) . '/' . $imgName);
+        $imageData = ImageIntervention::make(public_path($foldersPath) . '/' . $imgName);
         $imageHeight = $imageData->height();
         $imageWidth = $imageData->width();
-        $path = $this->storeFolderName . '/' . $imgName;
+        $path = $foldersPath . '/' . $imgName;
 
         return [
             'path' => $path,
