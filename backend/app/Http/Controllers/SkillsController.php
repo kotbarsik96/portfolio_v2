@@ -11,7 +11,14 @@ class SkillsController extends Controller
 {
     public function all()
     {
-        return Skill::all();
+        $skills = Skill::all();
+        foreach ($skills as $skill) {
+            if (is_numeric($skill->video_id))
+                $skill->video = Video::find($skill->video_id);
+            if (is_numeric($skill->image_id))
+                $skill->image = Image::find($skill->image_id);
+        }
+        return $skills;
     }
 
     public function single($id)
@@ -24,6 +31,8 @@ class SkillsController extends Controller
             $skill->video = Video::find($skill->video_id);
         if (is_numeric($skill->image_id))
             $skill->image = Image::find($skill->image_id);
+
+        // сюда добавить $skill->links, в которую сложить данные из таблицы works_skills, предварительно получив только данные о конкретном навыке
 
         return response($skill);
     }
@@ -62,7 +71,7 @@ class SkillsController extends Controller
     {
         \Illuminate\Support\Facades\Log::info($id);
         $skill = Skill::find($id);
-        if(!$skill)
+        if (!$skill)
             return response(['not_found' => true]);
 
         $skill->delete();

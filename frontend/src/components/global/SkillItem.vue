@@ -1,13 +1,14 @@
 <template>
     <li class="skill-item" :class="{ '__shown-links': isShownLinks }" ref="rootElem">
         <div class="skill-item__buttons">
-            <button class="skill-item__button icon-image" :class="{ '__active': mediaType === 'image' }" type="button"
-                @click="changeMedia('image')"></button>
+            <button v-if="data.image" class="skill-item__button icon-image" :class="{ '__active': mediaType === 'image' }"
+                type="button" @click="changeMedia('image')"></button>
+            <button v-if="data.video" class="skill-item__button icon-video" :class="{ '__active': mediaType === 'video' }"
+                type="button" @click="changeMedia('video')"></button>
             <button class="portfolio-item__button icon-question-mark" :class="{ '__active': isShownLinks }" type="button"
                 @click="toggleLinks"></button>
-            <button class="skill-item__button icon-video" :class="{ '__active': mediaType === 'video' }" type="button"
-                @click="changeMedia('video')"></button>
-            <RouterLink v-if="isMe" class="skill-item__button icon-pencil" :to="{ name: 'EditSkill', params: { id: data.id } }">
+            <RouterLink v-if="isMe" class="skill-item__button icon-pencil"
+                :to="{ name: 'EditSkill', params: { id: data.id } }">
             </RouterLink>
         </div>
         <div class="skill-item__container" ref="itemContainer">
@@ -25,9 +26,9 @@
             </div>
             <div class="skill-item__media-container" ref="mediaContainer">
                 <Transition name="shrink-out" mode="out-in">
-                    <img v-if="mediaType === 'image'" class="skill-item__media" :src="mediaSrc.image"
+                    <img v-if="imageSrc && mediaType === 'image'" class="skill-item__media" :src="imageSrc"
                         alt="Изображение навыка">
-                    <VideoPlayer v-else-if="mediaType === 'video'" class="skill-item__media" :src="mediaSrc.video">
+                    <VideoPlayer v-else-if="videoSrc && mediaType === 'video'" class="skill-item__media" :src="videoSrc">
                     </VideoPlayer>
                 </Transition>
             </div>
@@ -36,7 +37,7 @@
         </div>
         <div class="skill-item__text">
             <button class="skill-item__title" type="button" @click="toggleLinks">
-                Анимации при прокрутке страницы
+                {{ data.title }}
             </button>
         </div>
     </li>
@@ -52,8 +53,6 @@ import folderBackUrl from '@/assets/images/portfolio-item/folder-back.png';
 import folderFrontUrl from '@/assets/images/portfolio-item/folder-front.png';
 import folderBackDarkUrl from '@/assets/images/portfolio-item/folder-dark-back.png';
 import folderFrontDarkUrl from '@/assets/images/portfolio-item/folder-dark-front.png';
-import videoSrc from '@/assets/video/skill-item/scroll-anim.mp4';
-import imageSrc from '@/assets/images/skill-item/scroll-anim.png';
 
 export default {
     name: 'PortfolioItem',
@@ -66,23 +65,10 @@ export default {
             required: true
         }
     },
-    mounted() {
-        const store = useMyStore();
-        this.theme = store.theme;
-        store.$subscribe((m, state) => this.theme = state.theme);
-
-        this.sliceLinksPages();
-        window.addEventListener("resize", () => {
-            // таким образом метод будет вызван спустя некоторое время после того, как пользователь изменит размер экрана, иначе он будет вызываться очень много раз
-            if (this.sliceLinksTimeout)
-                clearInterval(this.sliceLinksTimeout);
-            this.sliceLinksTimeout = setTimeout(this.sliceLinksPages, 500);
-        });
-    },
     data() {
         return {
             theme: '',
-            isShownLinks: false,
+            isShownLinks: true,
             linksList: [
                 'AudioFreeDesign (на странице товара)',
                 'Flowers Club (в карточке товара, в описании)',
@@ -97,12 +83,21 @@ export default {
             ],
             linksPages: [],
             linksPageNumber: 1,
-            mediaType: 'image',
-            mediaSrc: {
-                image: imageSrc,
-                video: videoSrc
-            },
+            mediaType: '',
         }
+    },
+    mounted() {
+        const store = useMyStore();
+        this.theme = store.theme;
+        store.$subscribe((m, state) => this.theme = state.theme);
+
+        this.sliceLinksPages();
+        window.addEventListener("resize", () => {
+            // таким образом метод будет вызван спустя некоторое время после того, как пользователь изменит размер экрана, иначе он будет вызываться очень много раз
+            if (this.sliceLinksTimeout)
+                clearInterval(this.sliceLinksTimeout);
+            this.sliceLinksTimeout = setTimeout(this.sliceLinksPages, 500);
+        });
     },
     methods: {
         async toggleLinks() {
@@ -242,23 +237,28 @@ export default {
             if (this.theme === 'dark')
                 return `url(${folderFrontDarkUrl})`;
         },
-    }
+        imageSrc() {
+            if (this.data.image) {
+                if (!this.mediaType) {
+                    this.mediaType = 'image';
+                    this.isShownLinks = false;
+                }
+                return `${import.meta.env.VITE_BACKEND_LINK}${this.data.image.path}`;
+            }
+
+            return null;
+        },
+        videoSrc() {
+            if (this.data.video) {
+                if (!this.mediaType) {
+                    this.mediaType = 'video';
+                    this.isShownLinks = false;
+                }
+                return `${import.meta.env.VITE_BACKEND_LINK}${this.data.video.path}`;
+            }
+
+            return null;
+        },
+    },
 }
 </script>
-
-<style>
-.shrink-out-enter-active,
-.shrink-out-leave-active {
-    transition: all .3s ease;
-}
-
-.shrink-out-enter-from,
-.shrink-out-leave-to {
-    transform: scale(0);
-}
-
-.shrink-out-leave-from,
-.shrink-out-enter-to {
-    transform: scale(1);
-}
-</style>
