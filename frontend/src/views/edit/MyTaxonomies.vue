@@ -5,7 +5,8 @@
         </h3>
         <div class="add edit-taxonomy">
             <div class="edit-taxonomy__search-container">
-                <MySearch ref="searchInput" inputId="search-type" placeholder="Поиск" name="search-type"></MySearch>
+                <MySearch ref="searchInput" inputId="search-type" placeholder="Поиск" name="search-type"
+                    v-model="searchValue"></MySearch>
             </div>
             <div class="edit-taxonomy__new-input">
                 <TextInput ref="addTaxInput" v-model="newTaxValue" :placeholder="$route.meta.titleNew"
@@ -15,9 +16,11 @@
                 </button>
             </div>
             <ul class="edit-taxonomy__list">
-                <TaxonomyItem v-for="obj in taxonomies" :key="obj.id" :tax="obj.title" @changeTax="onChangeTax"
-                    @removeTax="onRemoveTax">
-                </TaxonomyItem>
+                <TransitionGroup :css="false" @before-enter="onBeforeEnter" @enter="onEnter" @leave="onLeave">
+                    <TaxonomyItem v-for="(obj, index) in taxonomiesSearch" :key="obj.id" :tax="obj.title"
+                        :data-index="index" @changeTax="onChangeTax" @removeTax="onRemoveTax">
+                    </TaxonomyItem>
+                </TransitionGroup>
             </ul>
             <div class="add__buttons">
                 <button class="button button--color_2" type="button" @click="saveTaxes">
@@ -32,7 +35,9 @@
 import MySearch from '@/components/global/MySearch.vue';
 import TaxonomyItem from '@/components/private/TaxonomyItem.vue';
 import axios from 'axios';
+import gsap from 'gsap';
 import { useMyStore } from '@/stores/store.js';
+import { getHeight } from '@/assets/scripts/scripts.js';
 
 export default {
     name: 'MyTypes',
@@ -51,8 +56,10 @@ export default {
     },
     data() {
         return {
+            searchValue: '',
             newTaxValue: '',
-            taxonomies: []
+            taxonomies: [],
+            taxonomiesSearch: []
         }
     },
     methods: {
@@ -138,11 +145,55 @@ export default {
             const url = `${import.meta.env.VITE_API_LINK}taxonomy/${this.taxonomyTitle}/${obj.id}`;
             await axios.delete(url);
             this.loadTaxonomies();
+        },
+        doSearch() {
+            const query = this.searchValue.trim();
+            const regexp = new RegExp(query, 'i');
+
+            if (!this.searchValue) {
+                this.taxonomiesSearch = this.taxonomies;
+                return;
+            }
+
+            this.taxonomiesSearch = this.taxonomies.filter(obj => {
+                return obj.title.match(regexp);
+            });
+        },
+        onBeforeEnter(el) {
+            gsap.set(el, {
+                opacity: 0,
+                height: 0
+            });
+        },
+        onEnter(el, onComplete) {
+            const height = getHeight(el);
+            gsap.to(el, {
+                opacity: 1,
+                height: `${height}px`,
+                delay: el.dataset.index * 0.15,
+                onComplete
+            });
+        },
+        onLeave(el, onComplete) {
+            gsap.to(el, {
+                opacity: 0,
+                height: 0,
+                delay: el.dataset.index * 0.15,
+                onComplete
+            });
         }
     },
     computed: {
         taxonomyTitle() {
             return this.$route.meta.taxonomyTitle;
+        }
+    },
+    watch: {
+        searchValue() {
+            this.doSearch();
+        },
+        taxonomies() {
+            this.doSearch();
         }
     },
 }
