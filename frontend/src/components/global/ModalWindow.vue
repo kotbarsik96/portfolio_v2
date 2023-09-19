@@ -31,17 +31,24 @@ export default {
             wasConfirmed: false
         }
     },
+    data() {
+        return {
+            wasConfirmed: false,
+
+        }
+    },
     methods: {
-        removeSelf() {
-            if (!this.wasConfirmed)
-                this.onDeclineClick(true);
-            
+        removeSelf(fromDeclineClick = false) {
+            if (!this.wasConfirmed && !fromDeclineClick)
+                this.onDeclineClick();
+
             const store = useModalsStore();
             store.removeFirstModalWindow();
         },
         onConfirmClick() {
             this.wasConfirmed = true;
-            const callback = this.propsForModalWindow.confirm.callback;
+            const callback = this.propsForModalWindow.confirm.callback
+                ? this.propsForModalWindow.confirm.callback : null;
 
             if (typeof callback === 'function') {
                 const args = this.propsForModalWindow.confirm.args || {};
@@ -50,15 +57,15 @@ export default {
 
             this.removeSelf();
         },
-        onDeclineClick(isFromRemoveSelf = false) {
-            const callback = this.propsForModalWindow.decline.callback;
+        onDeclineClick() {
+            const callback = this.propsForModalWindow.decline
+                ? this.propsForModalWindow.decline.callback : null;
             if (typeof callback === 'function') {
                 const args = this.propsForModalWindow.decline.args || {};
                 callback(args);
             }
 
-            if (!isFromRemoveSelf)
-                this.removeSelf();
+            this.removeSelf(true);
         }
     },
     computed: {
