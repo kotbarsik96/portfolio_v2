@@ -6,18 +6,20 @@
         </h3>
         <div class="add" ref="form">
             <div class="add__inputs-section">
-                <InputItem class="input-item--full" label="Название" placeholder="Название" id="skill-title" name="title"
-                    :value="title">
+                <InputItem class="input-item--full" ref="titleInput" label="Название" placeholder="Название"
+                    id="skill-title" name="title" :defaultValue="title" v-model="title">
                 </InputItem>
             </div>
             <div class="add__load-media">
                 <div class="add__load-media-item">
-                    <LoadImage title="Изображение" ref="imageLoadComponent" subfolderName="skill" :placeholderData="imageData" v-model="imageId"
-                        v-model:isUploading="isUploadingImage"></LoadImage>
+                    <LoadImage title="Изображение" ref="imageLoadComponent" subfolderName="skill"
+                        :placeholderData="skillData.image" v-model="imageId" v-model:isUploading="isUploadingImage">
+                    </LoadImage>
                 </div>
                 <div class="add__load-media-item">
-                    <LoadVideo title="Видео" ref="videoLoadComponent" subfolderName="skill" :placeholderData="videoData" v-model="videoId"
-                        v-model:isUploading="isUploadingVideo"></LoadVideo>
+                    <LoadVideo title="Видео" ref="videoLoadComponent" subfolderName="skill"
+                        :placeholderData="skillData.video" v-model="videoId" v-model:isUploading="isUploadingVideo">
+                    </LoadVideo>
                 </div>
             </div>
             <div class="add__buttons">
@@ -40,7 +42,6 @@ import LoadImage from '@/components/private/LoadImage.vue';
 import LoadVideo from '@/components/private/LoadVideo.vue';
 import { useMyStore } from '@/stores/store.js';
 import axios from 'axios';
-import { getDataFromForms } from '@/assets/scripts/scripts.js';
 
 export default {
     name: 'MySkill',
@@ -50,43 +51,68 @@ export default {
     },
     data() {
         return {
+            title: '',
+            skillData: {},
             videoId: null,
             imageId: null,
             isUploadingImage: false,
             isUploadingVideo: false,
-            skillData: null,
-            uploadedImageData: null,
-            uploadedVideoData: null
         }
     },
     async beforeRouteEnter(to, from, next) {
-        next(self => {
-            if (self.$route.params.id)
-                self.getDataById();
-        });
+        const store = useMyStore();
+        store.isLoading = true;
+
+        let skillData = {};
+
+        const skillId = to.params.id;
+        // если это страница добавления навыка, просто закончить инициализацию
+        if (!skillId) {
+            next(callback);
+            return;
+        }
+
+        // если есть id, загрузить навык по этому id
+        const url = `${import.meta.env.VITE_API_LINK}skill/${skillId}`;
+        try {
+            const res = await axios.get(url);
+            if (res.data.not_found) {
+                store.isLoading = false;
+                next((self) => self.$router.push({ name: 'AddSkill' }));
+                return;
+            } else {
+                skillData = res.data;
+            }
+        } catch (err) { }
+
+        // в callback загруженная работа отправится в this.skillData (this === self)
+        next(callback);
+
+        function callback(self) {
+            self.nullifyData();
+            self.skillData = skillData;
+            self.setSkillData();
+            store.isLoading = false;
+        }
     },
     beforeRouteLeave() {
-        this.nullifyAll();
+        this.nullifyData();
     },
     methods: {
-        nullifyAll() {
+        nullifyData() {
+            this.title = '';
+            this.skillData = {};
             this.videoId = null;
             this.imageId = null;
-            this.isUploadingImage = false;
-            this.isUploadingVideo = false;
-            this.skillData = null;
-            this.uploadedImageData = null;
-            this.uploadedVideoData = null;
+
+            const refreshableRefs = ['titleInput'];
+            refreshableRefs.forEach(str => {
+                if (this.$refs[str] && typeof this.$refs[str].refresh === 'function')
+                    this.$refs[str].refresh();
+            });
         },
-        async getDataById() {
-            const store = useMyStore();
-            store.isLoading = true;
-
-            const id = this.$route.params.id;
-            const res = await axios.get(`${import.meta.env.VITE_API_LINK}skill/${id}`);
-            this.skillData = res.data;
-
-            store.isLoading = false;
+        setSkillData() {
+            this.title = this.skillData.title;
         },
         // пока загружается изображение или видео, не дает выполнить update()/upload() навыка. Эти методы будут вызваны как только все медиа будут загружены, если они загружаются
         checkIfUploading(methodName = '') {
@@ -113,10 +139,11 @@ export default {
             return false;
         },
         getDataForUploading() {
-            const data = getDataFromForms(this.$refs.form);
-            data.image_id = this.imageId;
-            data.video_id = this.videoId;
-            return data;
+            return {
+                title: this.title,
+                image_id: this.imageId,
+                video_id: this.videoId,
+            }
         },
         async load() {
             if (this.checkIfUploading('load'))
@@ -167,12 +194,6 @@ export default {
         },
     },
     computed: {
-        title() {
-            if (this.skillData && this.skillData.title)
-                return this.skillData.title;
-
-            return null;
-        },
         imageData() {
             if (this.skillData && this.skillData.image)
                 return this.skillData.image;
@@ -188,5 +209,3 @@ export default {
     }
 }
 </script>
-
-<style></style>

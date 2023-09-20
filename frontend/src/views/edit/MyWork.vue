@@ -75,7 +75,11 @@ export default {
         const url = `${import.meta.env.VITE_API_LINK}work/${workId}`;
         try {
             const res = await axios.get(url);
-            if (!res.data.error) {
+            if (res.data.not_found) {
+                store.isLoading = false;
+                next(self => self.$router.push({ name: 'AddWork' }));
+                return;
+            } else {
                 workData = res.data;
             }
         } catch (err) { }
