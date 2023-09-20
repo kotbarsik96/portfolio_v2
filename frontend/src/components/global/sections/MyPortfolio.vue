@@ -29,7 +29,7 @@
                         </button>
                     </Transition>
                 </div>
-                <MyFilter class="portfolio__filter modal"></MyFilter>
+                <MyFilter class="portfolio__filter modal" :body="filterBody"></MyFilter>
             </div>
         </div>
     </section>
@@ -39,6 +39,7 @@
 import PortfolioItem from '../PortfolioItem.vue';
 import MyFilter from '../MyFilter.vue';
 import emptyIcon from '@/assets/images/icons/cricket.svg';
+import axios from 'axios';
 
 export default {
     name: 'MyPortfolio',
@@ -46,13 +47,26 @@ export default {
         PortfolioItem,
         MyFilter
     },
-    async mounted() {
-        
+    created() {
+        this.loadWorks();
     },
     data() {
         return {
             works: null,
             emptyIcon
+        }
+    },
+    computed: {
+        filterBody(){
+            
+        }
+    },
+    methods: {
+        async loadWorks() {
+            try {
+                const res = await axios.get(`${import.meta.env.VITE_API_LINK}works`);
+                this.works = res.data;
+            } catch (err) { }
         }
     }
 }

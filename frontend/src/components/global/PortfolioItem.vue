@@ -1,14 +1,14 @@
 <template>
     <li class="portfolio-item" :class="{ '__shown-skills': isShownSkills }">
         <div class="portfolio-item__buttons">
-            <button class="portfolio-item__button icon-desktop" :class="{ '__active': imageType === 'desktop' }"
-                type="button" @click="changeImage('desktop')"></button>
+            <button v-if="data.image_desktop" class="portfolio-item__button icon-desktop"
+                :class="{ '__active': imageType === 'desktop' }" type="button" @click="changeImage('desktop')"></button>
             <button class="portfolio-item__button icon-question-mark" :class="{ '__active': isShownSkills }" type="button"
                 @click="toggleSkills"></button>
-            <button class="portfolio-item__button icon-mobile" :class="{ '__active': imageType === 'mobile' }" type="button"
-                @click="changeImage('mobile')"></button>
-            <RouterLink v-if="isMe" class="portfolio-item__button icon-pencil" :to="{ name: 'EditWork', params: { id: data.id } }"
-                type="button"></RouterLink>
+            <button v-if="data.image_mobile" class="portfolio-item__button icon-mobile"
+                :class="{ '__active': imageType === 'mobile' }" type="button" @click="changeImage('mobile')"></button>
+            <RouterLink v-if="isMe" class="portfolio-item__button icon-pencil"
+                :to="{ name: 'EditWork', params: { id: data.id } }" type="button"></RouterLink>
         </div>
         <div class="portfolio-item__container" ref="itemContainer">
             <div class="portfolio-item__folder-back" :style="{ backgroundImage: folderBackgroundBack }">
@@ -35,7 +35,8 @@
                     {{ data.tag }} {{ data.title }}
                 </span>
                 <span class="portfolio-item__stack">
-                    Стек: HTML/CSS, Vanilla JS, Gulp, PHP, Wordpress
+                    Стек:
+                    {{ stackList }}
                 </span>
             </a>
         </div>
@@ -51,8 +52,6 @@ import folderBackUrl from '@/assets/images/portfolio-item/folder-back.png';
 import folderFrontUrl from '@/assets/images/portfolio-item/folder-front.png';
 import folderBackDarkUrl from '@/assets/images/portfolio-item/folder-dark-back.png';
 import folderFrontDarkUrl from '@/assets/images/portfolio-item/folder-dark-front.png';
-import desktopUrl from '@/assets/images/portfolio-item/desktop.png';
-import mobileUrl from '@/assets/images/portfolio-item/mobile.png';
 
 export default {
     name: 'PortfolioItem',
@@ -78,23 +77,8 @@ export default {
     data() {
         return {
             theme: '',
-            imageUrl: desktopUrl,
             imageType: 'desktop',
             isShownSkills: false,
-            skillsList: [
-                'Слайдеры',
-                'Ползунок для установления цены (в фильтре товаров)',
-                'Табы',
-                'Спойлеры',
-                'Анимации при прокрутке',
-                'Ползунок для установления цены (в фильтре товаров)',
-                'Табы',
-                'Слайдеры',
-                'Анимации при прокрутке',
-                'Ползунок для установления цены (в фильтре товаров)',
-                'Еще что-то',
-                'Просто, чтобы понимать, что это другая страница'
-            ],
             skillsPages: [],
             skillsPageNumber: 1
         }
@@ -124,7 +108,8 @@ export default {
             this.isTogglingSkills = false;
         },
         async changeImage(imageType) {
-            if (this.isChangingImage || this.imageType === imageType) return;
+            if (this.isChangingImage || this.imageType === imageType)
+                return;
 
             const self = this;
             const imgContainer = this.$refs.imageContainer;
@@ -136,12 +121,10 @@ export default {
                 default:
                 case 'desktop':
                     await onTransitionEnd(imgContainer);
-                    this.imageUrl = desktopUrl;
                     this.imageType = imageType;
                     break;
                 case 'mobile':
                     await onTransitionEnd(imgContainer);
-                    this.imageUrl = mobileUrl;
                     this.imageType = imageType;
                     break;
             }
@@ -253,9 +236,33 @@ export default {
                 return `url(${folderFrontUrl})`;
             if (this.theme === 'dark')
                 return `url(${folderFrontDarkUrl})`;
+        },
+        skillsList() {
+            if (!this.data.skills)
+                return [];
+
+            return this.data.skills.map(obj => {
+                const descr = obj.description ? ` (${obj.description.toLowerCase()})` : '';
+                return `${obj.title}${descr}`;
+            });
+        },
+        stackList() {
+            if (!this.data.stack)
+                return '';
+
+            const arr = [];
+
+            this.data.stack.forEach(obj => arr.push(obj.title));
+            return arr.join(', ');
+        },
+        imageUrl() {
+            if (this.imageType === 'desktop' && this.data.image_desktop)
+                return `${import.meta.env.VITE_BACKEND_LINK}${this.data.image_desktop.path}`;
+            if (this.imageType === 'mobile' && this.data.image_mobile)
+                return `${import.meta.env.VITE_BACKEND_LINK}${this.data.image_mobile.path}`;
+
+            return null;
         }
     }
 }
 </script>
-
-<style></style>
