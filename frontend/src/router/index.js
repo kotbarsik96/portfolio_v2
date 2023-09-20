@@ -38,7 +38,7 @@ const router = createRouter({
                     component: () => import('@/views/edit/MyWork.vue'),
                     meta: {
                         isEditing: true
-                    }
+                    },
                 },
                 {
                     path: 'edit-skill/:id',

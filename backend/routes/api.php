@@ -26,6 +26,9 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/doubleauth', [AuthController::class, 'validate2fa']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
+Route::get('/works', [WorksController::class, 'all']);
+Route::get('/work/{id}', [WorksController::class, 'single']);
+
 Route::get('/skills', [SkillsController::class, 'all']);
 Route::get('/skill/{id}', [SkillsController::class, 'single']);
 

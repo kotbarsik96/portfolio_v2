@@ -10,7 +10,8 @@ export const useMyStore = defineStore("myStore", {
             theme: localStorage.getItem("kb96_portfolio_theme") || "light",
             isMe: false,
             qrCode: null,
-            isLoading: false
+            isLoading: false,
+            taxonomies: {},
         }
     },
     actions: {
@@ -47,6 +48,52 @@ export const useMyStore = defineStore("myStore", {
 
             Cookie.remove("user");
             Cookie.remove("user_id");
+        },
+        loadAllData() {
+            const apiUrl = import.meta.env.VITE_API_LINK;
+            const loadable = [
+                { key: 'stack', url: `${apiUrl}taxonomies/stack` },
+                { key: 'tags', url: `${apiUrl}taxonomies/tags` },
+                { key: 'types', url: `${apiUrl}taxonomies/types` },
+                { key: 'skills', url: `${apiUrl}skills` }
+            ];
+            loadable.forEach(async (obj) => {
+                try {
+                    const res = await axios.get(obj.url);
+                    if (!res.data.error) {
+                        this.taxonomies[obj.key] = res.data;
+                    }
+                } catch (err) { }
+            });
+        }
+    },
+    getters: {
+        worksFilterBody(state) {
+            return [
+                {
+                    name: 'types',
+                    title: 'Типы',
+                    values: state.taxonomies.types
+                        ? state.taxonomies.types.map(obj => obj.title)
+                        : []
+                },
+                {
+                    name: 'stack',
+                    title: 'Стек',
+                    values: state.taxonomies.stack
+                        ? state.taxonomies.stack.map(obj => obj.title)
+                        : []
+                },
+                {
+                    name: 'skills',
+                    title: 'Навыки',
+                    values: state.taxonomies.skills
+                        ? state.taxonomies.skills.map(obj => {
+                            return obj.title;
+                        })
+                        : []
+                }
+            ]
         }
     }
 });

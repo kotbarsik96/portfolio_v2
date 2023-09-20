@@ -39,7 +39,7 @@ export default {
         }
     },
     computed: {
-        valueToShow(){
+        valueToShow() {
             return this.value || '(нет значений)';
         }
     },
@@ -47,15 +47,21 @@ export default {
         setValue(value) {
             if (this.value === value)
                 return;
+            if (!this.values.includes(value))
+                return;
+
             this.value = value;
+        },
+        refresh(){
+            this.value = this.values[0];
         }
     },
     watch: {
         value() {
             this.$emit('update:modelValue', this.value);
         },
-        values(newValues, oldValues){
-            if(oldValues.length < 1 && newValues.length > 0) {
+        values(newValues, oldValues) {
+            if (oldValues.length < 1 && newValues.length > 0) {
                 this.value = this.values[0];
             }
         }

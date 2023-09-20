@@ -29,8 +29,10 @@ class TaxonomiesController extends Controller
     {
         switch ($taxonomyTitle) {
             case 'type':
+            case 'types':
                 return Type::class;
             case 'tag':
+            case 'tags':
                 return Tag::class;
             case 'stack':
                 return Stack::class;

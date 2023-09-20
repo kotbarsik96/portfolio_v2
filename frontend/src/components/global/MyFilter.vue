@@ -75,6 +75,9 @@ export default {
         }
     },
     methods: {
+        closestSectionItem(relative) {
+            return relative.closest('.filter__section-item');
+        },
         async toggleBody(bool = null) {
             if (typeof bool !== 'boolean')
                 this.isBodyShown = !this.isBodyShown;
@@ -86,6 +89,9 @@ export default {
                 this.hideBody();
         },
         async onBodyTransEnd() {
+            if(!this.$refs.filterBody)
+                return;
+
             await onTransitionEnd(this.$refs.filterBody);
             this.$refs.filterBody.style.removeProperty('transition');
             this.isTogglingBody = false;
@@ -142,8 +148,7 @@ export default {
             this.toggleBody(true);
 
             const checkbox = this.$refs.filterCheckbox
-                .find(node => node.closest('.filter__section-item')
-                    === event.target.closest('.filter__section-item'));
+                .find(node => this.closestSectionItem(node) === this.closestSectionItem(event.target));
             if (checkbox && checkbox.checked) {
                 let obj = null;
 
@@ -157,24 +162,47 @@ export default {
                     obj.description = value;
             }
         },
+        refresh() {
+            this.checkedValues.forEach(section => {
+                section.values.forEach(obj => {
+                    obj.input.checked = false;
+                    obj.input.dispatchEvent(new Event('checked'));
+                });
+            });
+        },
+        setChecked(value, comment = null) {
+            const checkbox = this.$refs.filterCheckbox.find(obj => obj.value === value);
+            if (!checkbox)
+                return;
+
+            checkbox.checked = true;
+            checkbox.dispatchEvent(new Event('change'));
+            if (comment) {
+                const commentSpan = this.$refs.comment
+                    .find(node => this.closestSectionItem(node) === this.closestSectionItem(checkbox));
+                if (commentSpan) {
+                    commentSpan.textContent = comment;
+                    commentSpan.dispatchEvent(new Event('input'));
+                }
+            }
+        },
         addToChecked(event, section, value) {
             let obj = this.checkedValues.find(o => o.title === section.title);
             if (!obj) {
-                obj = { 
-                    title: section.title, 
+                obj = {
+                    title: section.title,
                     name: section.name,
-                    values: [] 
+                    values: []
                 };
                 this.checkedValues.push(obj);
             }
 
             if (event.target.checked) {
-                const data = { value };
+                const data = { value, input: event.target };
                 if (section.allowComment) {
                     const span = this.$refs.comment
                         .find(node => {
-                            return node.closest('.filter__section-item')
-                                === event.target.closest('.filter__section-item');
+                            return this.closestSectionItem(node) === this.closestSectionItem(event.target);
                         });
                     if (span)
                         data.description = getTextContent(span);
@@ -204,5 +232,3 @@ export default {
     }
 }
 </script>
-
-<style></style>

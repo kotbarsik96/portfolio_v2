@@ -6,7 +6,7 @@
         </h3>
         <div class="add">
             <div class="add__inputs-section">
-                <InputItem class="input-item--full" label="Название" placeholder="Название" id="work-title"
+                <InputItem class="input-item--full" ref="titleInput" label="Название" placeholder="Название" id="work-title"
                     name="work_title" :defaultValue="workData.title" v-model="workTitle"></InputItem>
             </div>
             <div class="add__inputs-section">
@@ -14,18 +14,20 @@
                     <span class="input-item__label">
                         Тег
                     </span>
-                    <MySelect :values="tags" v-model="tagValue"></MySelect>
+                    <MySelect :values="tags" v-model="tagValue" ref="tagSelect"></MySelect>
                 </div>
             </div>
             <div class="add__inputs-section">
-                <MyFilter class="modal" :body="filterBody" v-model="checkedValues"></MyFilter>
+                <MyFilter class="modal" ref="filter" :body="filterBody" v-model="checkedValues"></MyFilter>
             </div>
             <div class="add__load-media">
                 <div class="add__load-media-item">
-                    <LoadImage title="Десктоп версия" subfolderName="works" v-model="imageDesktopId"></LoadImage>
+                    <LoadImage title="Десктоп версия" :placeholderData="workData.image_desktop" subfolderName="works"
+                        v-model="imageDesktopId"></LoadImage>
                 </div>
                 <div class="add__load-media-item add__load-media-item--mobile">
-                    <LoadImage title="Мобильная версия" subfolderName="works" v-model="imageMobileId"></LoadImage>
+                    <LoadImage title="Мобильная версия" :placeholderData="workData.image_mobile" subfolderName="works"
+                        v-model="imageMobileId"></LoadImage>
                 </div>
             </div>
             <div class="add__buttons">
@@ -48,6 +50,7 @@ import MyFilter from '@/components/global/MyFilter.vue';
 import LoadImage from '@/components/private/LoadImage.vue';
 import axios from 'axios';
 import { useMyStore } from '@/stores/store.js';
+import { mapState } from 'pinia';
 
 export default {
     name: 'MyWork',
@@ -55,83 +58,104 @@ export default {
         MyFilter,
         LoadImage
     },
-    async mounted() {
+    async beforeRouteEnter(to, from, next) {
+        const store = useMyStore();
+        store.isLoading = true;
+
+        let workData = {};
+
+        const workId = to.params.id;
+        // если это страница добавления работы, просто закончить инициализацию
+        if (!workId) {
+            next(callback);
+            return;
+        }
+
+        // если есть id, загрузить работу по этому id
+        const url = `${import.meta.env.VITE_API_LINK}work/${workId}`;
+        try {
+            const res = await axios.get(url);
+            if (!res.data.error) {
+                workData = res.data;
+            }
+        } catch (err) { }
+
+        // в callback загруженная работа отправится в this.workData (this === self)
+        next(callback);
+
+        function callback(self) {
+            self.nullifyData();
+            self.workData = workData;
+            self.setWorkData();
+            store.isLoading = false;
+        }
     },
-    created() {
-        this.loadSettingsData();
+    beforeRouteLeave() {
+        this.nullifyData();
     },
     data() {
         return {
             workData: {},
             workTitle: '',
             tagValue: '',
-            taxonomies: {},
-            skills: [],
             imageDesktopId: null,
             imageMobileId: null,
             checkedValues: []
         }
     },
     computed: {
-        tags() {
-            if (!this.taxonomies.tag)
-                return [];
-
-            return this.taxonomies.tag.map(obj => obj.title);
-        },
-        types() {
-            if (!this.taxonomies.type)
-                return [];
-
-            return this.taxonomies.type.map(obj => obj.title);
-        },
-        stack() {
-            if (!this.taxonomies.stack)
-                return [];
-
-            return this.taxonomies.stack.map(obj => obj.title);
-        },
+        ...mapState(useMyStore, ['taxonomies', 'worksFilterBody']),
         filterBody() {
-            const array = [];
-
-            array.push({
-                name: 'types',
-                title: 'Типы',
-                values: this.types
-            }, {
-                name: 'skills',
-                title: 'Навыки',
-                values: this.skills.map(obj => {
-                    return obj.title;
-                }),
-                allowComment: true
+            return this.worksFilterBody.map(obj => {
+                if (obj.name === 'skills') {
+                    obj.allowComment = true;
+                }
+                return obj;
             });
+        },
+        tags() {
+            if (!this.taxonomies.tags)
+                return [];
 
-            return array;
-        }
+            return this.taxonomies.tags.map(obj => obj.title);
+        },
     },
     methods: {
-        loadSettingsData() {
-            this.loadTaxonomies();
-            this.loadSkills();
-        },
-        loadTaxonomies() {
-            const taxonomiesTitles = ['tag', 'type', 'stack'];
-            taxonomiesTitles.forEach(async (taxonomyTitle) => {
-                const url = `${import.meta.env.VITE_API_LINK}taxonomies/${taxonomyTitle}`;
-                const res = await axios.get(url);
+        // загрузить все данные
+        nullifyData() {
+            this.workData = {};
+            this.tagValue = ''
+            this.workTitle = '';
+            this.tagValue = '';
+            this.imageDesktopId = null;
+            this.imageMobileId = null;
 
-                if (res.data && !res.data.error)
-                    this.taxonomies[taxonomyTitle] = res.data;
+            const refreshableRefs = ['titleInput', 'filter', 'tagSelect'];
+            refreshableRefs.forEach(str => {
+                if (this.$refs[str] && typeof this.$refs[str].refresh === 'function')
+                    this.$refs[str].refresh();
             });
         },
-        async loadSkills() {
-            const url = `${import.meta.env.VITE_API_LINK}skills`;
-            const res = await axios.get(url);
+        setWorkData() {
+            if (this.workData.tag) {
+                this.$refs.tagSelect.setValue(this.workData.tag);
+            }
 
-            if (res.data && !res.data.error)
-                this.skills = res.data;
+            const filterValues = ['skills', 'stack', 'types'];
+            filterValues.forEach(val => {
+                if (Array.isArray(this.workData[val])) {
+                    this.workData[val].forEach(obj => {
+                        if (!obj)
+                            return;
+
+                        this.$refs.filter.setChecked(obj.title, obj.description);
+                    });
+                }
+            });
         },
+        //================ загрузить все данные - конец
+
+        // rest api
         update() { },
         remove() { },
         async load() {
@@ -148,15 +172,14 @@ export default {
             const url = `${import.meta.env.VITE_API_LINK}work`;
             try {
                 const res = await axios.post(url, data);
-                if(res.data.id) {
+                if (res.data.id) {
                     this.$router.push({ name: 'EditWork', params: { id: res.data.id } });
                 }
             } catch (err) { }
 
             store.isLoading = false;
         },
+        //================ rest api - конец
     },
 }
 </script>
-
-<style></style>

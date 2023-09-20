@@ -1,5 +1,5 @@
 <template>
-    <TextInput iconName="icon-search" :inputId="inputId" :name="name" v-model="searchValue"></TextInput>
+    <TextInput iconName="icon-search" ref="textInput" :inputId="inputId" :name="name" v-model="searchValue"></TextInput>
 </template>
 
 <script>
@@ -27,6 +27,11 @@ export default {
     watch: {
         searchValue() {
             this.$emit('update:modelValue', this.searchValue);
+        }
+    },
+    methods: {
+        refresh() {
+            this.$refs.textInput.refresh();
         }
     }
 }

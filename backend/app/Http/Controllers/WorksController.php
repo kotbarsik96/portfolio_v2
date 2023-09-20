@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\WorksStack;
 use Illuminate\Http\Request;
 use App\Models\Work;
 use App\Models\Type;
@@ -9,9 +10,78 @@ use App\Models\Skill;
 use App\Models\WorksSkills;
 use App\Models\WorksTypes;
 use App\Models\Tag;
+use App\Models\Stack;
+use App\Models\Image;
 
 class WorksController extends Controller
 {
+    public function getWorkData($work)
+    {
+        function getData($array, $dataKey, $model)
+        {
+            foreach ($array as $key => $data) {
+                $obj = $model::find($data->$dataKey);
+                if (!$obj)
+                    continue;
+
+                if ($data->description)
+                    $obj->description = $data->description;
+                $array[$key] = $obj;
+            }
+            return $array;
+        }
+
+        if (is_numeric($work->tag_id))
+            $work->tag = $this->getColumnById($work->tag_id, Tag::class);
+        if (is_numeric($work->image_desktop_id))
+            $work->image_desktop = Image::find($work->image_desktop_id);
+        if (is_numeric($work->image_mobile_id))
+            $work->image_mobile = Image::find($work->image_mobile_id);
+
+        $work->types = WorksTypes::where('work_id', $work->id)->get();
+        $work->skills = WorksSkills::where('work_id', $work->id)->get();
+        $work->stack = WorksStack::where('work_id', $work->id)->get();
+
+        if (count($work->types) > 0)
+            $work->types = getData($work->types, 'type_id', Type::class);
+        if (count($work->skills) > 0)
+            $work->skills = getData($work->skills, 'skill_id', Skill::class);
+        if (count($work->stack) > 0)
+            $work->stack = getData($work->stack, 'stack_id', Stack::class);
+
+        return $work;
+    }
+
+    public function getColumnById($id, $model, $column = 'title')
+    {
+        if (!$model)
+            return false;
+
+        $obj = $model::find($id);
+        if (!$obj)
+            return false;
+
+        return $obj->$column;
+    }
+
+    public function all()
+    {
+        $works = Work::all();
+        foreach ($works as $key => $work) {
+            $works[$key] = $this->getWorkData($work);
+        }
+        return $works;
+    }
+
+    public function single($id)
+    {
+        $work = Work::find($id);
+        if (!$work)
+            return ['not_found' => true];
+
+        return $this->getWorkData($work);
+    }
+
     public function validateRequest(Request $request)
     {
         $tag = Tag::where('title', trim($request['tag']))->first();
@@ -116,6 +186,14 @@ class WorksController extends Controller
                             'addingColumnName' => 'skill_id',
                             'modelToFind' => Skill::class,
                             'modelToCreate' => WorksSkills::class,
+                        ]);
+                        break;
+                    case 'stack':
+                        $this->storeCheckedValues($obj['values'], [
+                            'workId' => $work->id,
+                            'addingColumnName' => 'stack_id',
+                            'modelToFind' => Stack::class,
+                            'modelToCreate' => WorksStack::class,
                         ]);
                         break;
                 }

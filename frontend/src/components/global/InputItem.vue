@@ -4,7 +4,7 @@
             {{ label }}
         </label>
         <TextInput :inputId="id" :placeholder="placeholder" :name="name" :type="type" :defalutValue="defaultValue"
-            v-model="value"></TextInput>
+            v-model="value" ref="textInput"></TextInput>
     </div>
 </template>
 
@@ -38,6 +38,15 @@ export default {
     watch: {
         value() {
             this.$emit('update:modelValue', this.value);
+        },
+        defaultValue(){
+            if(!this.$refs.textInput.value)
+                this.$refs.textInput.value = this.defaultValue;
+        }
+    },
+    methods: {
+        refresh(){
+            this.$refs.textInput.refresh();
         }
     }
 }

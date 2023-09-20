@@ -29,7 +29,7 @@
                         </button>
                     </Transition>
                 </div>
-                <MyFilter class="portfolio__filter modal" :body="filterBody"></MyFilter>
+                <MyFilter class="portfolio__filter modal" isHideable :body="worksFilterBody"></MyFilter>
             </div>
         </div>
     </section>
@@ -40,6 +40,9 @@ import PortfolioItem from '../PortfolioItem.vue';
 import MyFilter from '../MyFilter.vue';
 import emptyIcon from '@/assets/images/icons/cricket.svg';
 import axios from 'axios';
+import { useMyStore } from '@/stores/store';
+import { mapState } from 'pinia';
+
 
 export default {
     name: 'MyPortfolio',
@@ -57,9 +60,7 @@ export default {
         }
     },
     computed: {
-        filterBody(){
-            
-        }
+        ...mapState(useMyStore, ['worksFilterBody']),
     },
     methods: {
         async loadWorks() {

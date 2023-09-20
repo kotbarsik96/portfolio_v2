@@ -30,20 +30,29 @@ export default {
             type: String,
             default: 'input'
         },
-        defaultValue: String
-    },
-    mounted() {
-        if (this.defaultValue)
-            this.$refs.input.value = this.defaultValue;
+        defaultValue: {
+            type: String,
+            default: ''
+        }
     },
     data() {
         return {
-            value: ''
+            value: this.defaultValue
         }
     },
     watch: {
         value() {
             this.$emit('update:modelValue', this.value);
+        },
+        defaultValue(){
+            if(!this.value) {
+                this.value = this.defaultValue;
+            }
+        }
+    },
+    methods: {
+        refresh(){
+            this.value = '';
         }
     }
 }

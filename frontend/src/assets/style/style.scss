@@ -1087,10 +1087,12 @@ label {
     }
 
     &__title {
+        display: block;
         font-style: italic;
     }
 
     &__stack {
+        display: block;
         margin-top: 5px;
     }
 

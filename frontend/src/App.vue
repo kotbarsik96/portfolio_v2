@@ -41,6 +41,7 @@ export default {
         ModalWindow
     },
     created() {
+        useMyStore().loadAllData();
     },
     mounted() {
         // цветовая тема
