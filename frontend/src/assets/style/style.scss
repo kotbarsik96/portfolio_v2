@@ -142,6 +142,7 @@ label {
 .shrink-out-enter-to {
     transform: scale(1);
 }
+
 /* <ANIMATIONS, TRANSITIONS>===================================================================== */
 
 /* <UI>========================================================================================== */
@@ -1159,12 +1160,12 @@ label {
         overflow: hidden;
     }
 
+    &__tab-button+&__body>&__section:first-child {
+        border-top: 1px solid #fff;
+    }
+
     &__section {
         border-bottom: 1px solid #fff;
-
-        &:first-child {
-            border-top: 1px solid #fff;
-        }
     }
 
     &__title,

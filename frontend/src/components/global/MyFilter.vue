@@ -13,17 +13,17 @@
                 <ul class="filter__section-items">
                     <li v-for="value in section.values" :key="value" class="filter__section-item">
                         <label class="filter__section-label checkbox-label">
-                            <input type="checkbox" :name="section.name" :value="value"
-                                @change="addToChecked($event, section.name, value)">
+                            <input type="checkbox" ref="filterCheckbox" :name="section.name" :value="value"
+                                @change="addToChecked($event, section, value)">
                             <span class="checkbox-label__box"></span>
                             <span class="checkbox-label__text">
                                 {{ value }}
                             </span>
                         </label>
                         <span v-if="section.allowComment" class="filter__section-item-comment editable" ref="comment"
-                            @blur="onCommentBlur" @input="toggleBody(true)"></span>
-                        <button v-if="section.allowComment" class="filter__section-item-write-button icon-pencil" type="button"
-                            @click="writeComment"></button>
+                            @blur="onCommentBlur" @input="onCommentInput($event, section)"></span>
+                        <button v-if="section.allowComment" class="filter__section-item-write-button icon-pencil"
+                            type="button" @click="writeComment"></button>
                     </li>
                 </ul>
             </div>
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { getHeight, onTransitionEnd, setEditable } from '@/assets/scripts/scripts.js';
+import { getHeight, onTransitionEnd, setEditable, getTextContent } from '@/assets/scripts/scripts.js';
 import { nextTick } from 'vue';
 
 export default {
@@ -138,18 +138,53 @@ export default {
         onCommentBlur(event) {
             event.target.removeAttribute('contenteditable');
         },
-        addToChecked(event, sectionTitle, value) {
-            let obj = this.checkedValues.find(o => o.title === sectionTitle);
+        onCommentInput(event, section) {
+            this.toggleBody(true);
+
+            const checkbox = this.$refs.filterCheckbox
+                .find(node => node.closest('.filter__section-item')
+                    === event.target.closest('.filter__section-item'));
+            if (checkbox && checkbox.checked) {
+                let obj = null;
+
+                for (let o of this.checkedValues) {
+                    obj = o.values.find(subO => subO.value === checkbox.value);
+                    if (obj)
+                        break;
+                }
+                const value = getTextContent(event.target);
+                if (obj)
+                    obj.description = value;
+            }
+        },
+        addToChecked(event, section, value) {
+            let obj = this.checkedValues.find(o => o.title === section.title);
             if (!obj) {
-                obj = { title: sectionTitle, values: [] };
+                obj = { 
+                    title: section.title, 
+                    name: section.name,
+                    values: [] 
+                };
                 this.checkedValues.push(obj);
             }
 
             if (event.target.checked) {
-                obj.values.push(value);
+                const data = { value };
+                if (section.allowComment) {
+                    const span = this.$refs.comment
+                        .find(node => {
+                            return node.closest('.filter__section-item')
+                                === event.target.closest('.filter__section-item');
+                        });
+                    if (span)
+                        data.description = getTextContent(span);
+                }
+
+                obj.values.push(data);
             } else {
-                const index = obj.values.indexOf(value);
-                obj.values.splice(index, 1);
+                const index = obj.values.findIndex(o => o.value === value);
+                if (index >= 0)
+                    obj.values.splice(index, 1);
             }
         }
     },

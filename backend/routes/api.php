@@ -32,7 +32,7 @@ Route::get('/skill/{id}', [SkillsController::class, 'single']);
 Route::get('/taxonomies/{title}', [TaxonomiesController::class, 'all']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    // test if user authorized
+    // test if user is authorized
     Route::post('/check-auth', [AuthController::class, 'checkAuth']);
 
     // works
