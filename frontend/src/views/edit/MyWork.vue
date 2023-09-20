@@ -110,7 +110,9 @@ export default {
     computed: {
         ...mapState(useMyStore, ['taxonomies', 'worksFilterBody']),
         filterBody() {
-            return this.worksFilterBody.map(obj => {
+            // чтобы не затрагивать исходный массив, делается клон массива и его содержимого. Объекты в массиве при этом также клонируются
+            const arr = this.worksFilterBody.map(obj => Object.assign({}, obj));
+            return arr.map(obj => {
                 if (obj.name === 'skills') {
                     obj.allowComment = true;
                 }

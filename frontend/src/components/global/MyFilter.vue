@@ -108,9 +108,9 @@ export default {
             fbody.style.removeProperty('padding');
             fbody.style.removeProperty('margin');
             fbody.style.cssText = `
-                    transition: all .3s;
-                    max-height: ${height + 10}px;
-                `;
+                transition: all .3s;
+                max-height: ${height + 100}px;
+            `;
             await onTransitionEnd(fbody);
 
             this.onBodyTransEnd();
