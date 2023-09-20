@@ -15,12 +15,17 @@ return new class extends Migration {
         Schema::create('skills', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->unsignedBigInteger('image_id')->nullable();
-            $table->unsignedBigInteger('video_id')->nullable();
+            $table->foreignId('image_id')
+                ->nullable()
+                ->constrained(table: 'images')
+                ->onUpdate('cascade')
+                ->nullOnDelete();
+            $table->foreignId('video_id')
+                ->nullable()
+                ->constrained(table: 'video')
+                ->onUpdate('cascade')
+                ->nullOnDelete();
             $table->timestamps();
-
-            $table->foreign('image_id')->references('id')->on('images');
-            $table->foreign('video_id')->references('id')->on('video');
         });
     }
 

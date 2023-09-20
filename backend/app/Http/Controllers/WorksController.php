@@ -82,6 +82,8 @@ class WorksController extends Controller
         return $this->getWorkData($work);
     }
 
+    /* validateRequest вернет только то, что относится к таблице "works"; данных для остальных таблиц в возвращенном массиве не будет 
+     */
     public function validateRequest(Request $request)
     {
         $tag = Tag::where('title', trim($request['tag']))->first();
@@ -95,7 +97,12 @@ class WorksController extends Controller
             'image_desktop_id' => 'numeric|nullable',
             'image_mobile_id' => 'numeric|nullable'
         ]);
-        $fields['title'] = trim($request['title']);
+        $fields = [
+            'title' => trim($request['title']),
+            'tag_id' => $request['tag_id'],
+            'image_desktop_id' => $request['image_desktop_id'],
+            'image_mobile_id' => $request['image_mobile_id'],
+        ];
         return $fields;
     }
 
@@ -145,8 +152,8 @@ class WorksController extends Controller
         }
         return true;
     }
-
-    public function store(Request $request)
+    
+    public function store(Request $request, $id = null)
     {
         $fields = $this->validateRequest($request);
 
@@ -154,12 +161,7 @@ class WorksController extends Controller
         if ($isTitleExists)
             return response(['exists' => true]);
 
-        $work = Work::create([
-            'title' => $fields['title'],
-            'tag_id' => $fields['tag_id'],
-            'image_desktop_id' => $fields['image_desktop_id'],
-            'image_mobile_id' => $fields['image_mobile_id']
-        ]);
+        $work = Work::create($fields);
 
         $checkedValues = $request['checkedValues'];
         if (is_array($checkedValues)) {
@@ -203,8 +205,14 @@ class WorksController extends Controller
         return $work;
     }
 
-    public function update()
+    public function update(Request $request, $id)
     {
+        $fields = $this->validateRequest($request);
+
+        $work = Work::find($id);
+        if ($work) {
+            // $work->update()
+        }
     }
 
     public function destroy()

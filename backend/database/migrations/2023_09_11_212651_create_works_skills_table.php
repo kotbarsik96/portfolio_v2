@@ -15,12 +15,15 @@ return new class extends Migration
     {
         Schema::create('works_skills', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('work_id');
-            $table->unsignedBigInteger('skill_id');
+            $table->foreignId('work_id')
+                ->constrained(table: 'works')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreignId('skill_id')
+                ->constrained(table: 'skills')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
             $table->longText('description');
-
-            $table->foreign('work_id')->references('id')->on('works');
-            $table->foreign('skill_id')->references('id')->on('skills');
         });
     }
 

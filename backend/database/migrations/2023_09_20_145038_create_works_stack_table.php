@@ -12,11 +12,15 @@ return new class extends Migration {
     {
         Schema::create('works_stack', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('work_id');
-            $table->unsignedBigInteger('stack_id');
-
-            $table->foreign('work_id')->references('id')->on('works');
-            $table->foreign('stack_id')->references('id')->on('stack');
+            $table->foreignId('work_id')
+                ->constrained(table: 'works')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreignId('stack_id')
+                ->constrained(table: 'works')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            ;
         });
     }
 

@@ -50,20 +50,25 @@ export const useMyStore = defineStore("myStore", {
             Cookie.remove("user_id");
         },
         loadAllData() {
-            const apiUrl = import.meta.env.VITE_API_LINK;
-            const loadable = [
-                { key: 'stack', url: `${apiUrl}taxonomies/stack` },
-                { key: 'tags', url: `${apiUrl}taxonomies/tags` },
-                { key: 'types', url: `${apiUrl}taxonomies/types` },
-                { key: 'skills', url: `${apiUrl}skills` }
-            ];
-            loadable.forEach(async (obj) => {
-                try {
-                    const res = await axios.get(obj.url);
-                    if (!res.data.error) {
-                        this.taxonomies[obj.key] = res.data;
-                    }
-                } catch (err) { }
+            return new Promise(resolve => {
+                const apiUrl = import.meta.env.VITE_API_LINK;
+                const loadable = [
+                    { key: 'stack', url: `${apiUrl}taxonomies/stack` },
+                    { key: 'tags', url: `${apiUrl}taxonomies/tags` },
+                    { key: 'types', url: `${apiUrl}taxonomies/types` },
+                    { key: 'skills', url: `${apiUrl}skills` }
+                ];
+                loadable.forEach(async (obj, index) => {
+                    try {
+                        const res = await axios.get(obj.url);
+                        if (!res.data.error) {
+                            this.taxonomies[obj.key] = res.data;
+                        }
+                    } catch (err) { }
+                    
+                    if (loadable.length - 1 === index)
+                        resolve(true);
+                });
             });
         }
     },

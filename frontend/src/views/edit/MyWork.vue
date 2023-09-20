@@ -159,20 +159,42 @@ export default {
                 }
             });
         },
-        //================ загрузить все данные - конец
+        // ================ загрузить все данные - конец
 
         // rest api
-        update() { },
-        remove() { },
-        async load() {
-            const store = useMyStore();
-            const data = {
+        getDataToUpload() {
+            return {
                 title: this.workTitle,
                 checkedValues: this.checkedValues,
                 tag: this.tagValue,
                 image_desktop_id: this.imageDesktopId,
                 image_mobile_id: this.imageMobileId
             }
+        },
+        async update() {
+            const id = this.workData.id;
+            if (!id)
+                return;
+
+            const store = useMyStore();
+            store.isLoading = true;
+
+            try {
+                const url = `${import.meta.env.VITE_API_LINK}work/${id}`;
+                const data = this.getDataToUpload();
+                const res = await axios.post(url, data);
+                console.log(res);
+                if (res.data.id) {
+                    this.workData = res.data;
+                }
+            } catch (err) { }
+
+            store.isLoading = false;
+        },
+        async remove() { },
+        async load() {
+            const store = useMyStore();
+            const data = this.getDataToUpload();
 
             store.isLoading = true;
             const url = `${import.meta.env.VITE_API_LINK}work`;

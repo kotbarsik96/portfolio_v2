@@ -119,6 +119,8 @@ router.beforeEach(async (to) => {
     const myStore = useMyStore();
     const isMe = await myStore.checkIfIsMe();
 
+    await myStore.loadAllData();
+
     if (!isMe && to.meta.mustBeMe)
         return { name: "Home" };
     if (isMe && to.meta.mustNotBeMe)

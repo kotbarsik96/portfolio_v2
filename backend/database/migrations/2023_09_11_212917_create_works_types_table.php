@@ -14,11 +14,15 @@ return new class extends Migration {
     {
         Schema::create('works_types', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('work_id');
-            $table->unsignedBigInteger('type_id');
-
-            $table->foreign('work_id')->references('id')->on('works');
-            $table->foreign('type_id')->references('id')->on('types');
+            $table->foreignId('work_id')
+                ->constrained(table: 'works')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreignId('type_id')
+                ->constrained(table: 'types')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            ;
         });
     }
 
