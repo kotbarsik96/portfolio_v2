@@ -1,27 +1,28 @@
 <template>
     <div class="filter" :class="{ '__shown': isBodyShown }">
-        <button class="filter__tab-button icon-filter" type="button" @click="toggleBody">
+        <button v-if="isHideable" class="filter__tab-button icon-filter" type="button" @click="toggleBody">
             <h4 class="filter__title">
-                Фильтр
+                {{ title }}
             </h4>
         </button>
         <div class="filter__body" ref="filterBody">
-            <div v-for="section in sections" :key="section.title" class="filter__section">
+            <div v-for="section in body" :key="section.title" class="filter__section">
                 <h5 class="filter__section-title">
                     {{ section.title }}
                 </h5>
                 <ul class="filter__section-items">
                     <li v-for="value in section.values" :key="value" class="filter__section-item">
                         <label class="filter__section-label checkbox-label">
-                            <input type="checkbox" :name="section.name" :value="value">
+                            <input type="checkbox" :name="section.name" :value="value"
+                                @change="addToChecked($event, section.name, value)">
                             <span class="checkbox-label__box"></span>
                             <span class="checkbox-label__text">
                                 {{ value }}
                             </span>
                         </label>
-                        <span v-if="allowComment" class="filter__section-item-comment editable" ref="comment" @blur="onCommentBlur"
-                            @input="() => toggleBody(true)"></span>
-                        <button v-if="allowComment" class="filter__section-item-write-button icon-pencil" type="button"
+                        <span v-if="section.allowComment" class="filter__section-item-comment editable" ref="comment"
+                            @blur="onCommentBlur" @input="toggleBody(true)"></span>
+                        <button v-if="section.allowComment" class="filter__section-item-write-button icon-pencil" type="button"
                             @click="writeComment"></button>
                     </li>
                 </ul>
@@ -32,11 +33,25 @@
 
 <script>
 import { getHeight, onTransitionEnd, setEditable } from '@/assets/scripts/scripts.js';
+import { nextTick } from 'vue';
 
 export default {
     name: 'MyFilter',
+    emits: ['update:modelValue'],
     props: {
-        allowComment: Boolean
+        modelValue: Array,
+        body: {
+            /* body: [
+                { title: 'Тип', values: ['Вёрстка по макету', 'Интеграция с backend'], allowComment: true }
+            ]*/
+            type: Array,
+            required: true
+        },
+        isHideable: Boolean,
+        title: {
+            type: String,
+            default: 'Фильтр'
+        }
     },
     mounted() {
         const self = this;
@@ -55,25 +70,8 @@ export default {
     data() {
         return {
             isBodyShown: false,
-            sections: [
-                {
-                    name: 'type',
-                    title: 'Тип',
-                    values: [
-                        'Посадка на Wordpress',
-                        'Вёрстка по макету'
-                    ]
-                },
-                {
-                    name: 'skills',
-                    title: 'Навыки',
-                    values: [
-                        'Слайдеры',
-                        'Спойлеры',
-                        'Анимации при прокрутке страницы и последующем текст екст текст текст'
-                    ]
-                }
-            ]
+            isTogglingBody: false,
+            checkedValues: []
         }
     },
     methods: {
@@ -82,26 +80,56 @@ export default {
                 this.isBodyShown = !this.isBodyShown;
             else this.isBodyShown = bool;
 
+            if (this.isBodyShown)
+                this.showBody();
+            else
+                this.hideBody();
+        },
+        async onBodyTransEnd() {
+            await onTransitionEnd(this.$refs.filterBody);
+            this.$refs.filterBody.style.removeProperty('transition');
+            this.isTogglingBody = false;
+        },
+        async showBody(isForced = false) {
+            if (this.isTogglingBody && !isForced)
+                return;
+
+            this.isTogglingBody = true;
+            this.isBodyShown = true;
+
             const fbody = this.$refs.filterBody;
-            if (this.isBodyShown) {
-                const height = getHeight(fbody);
-                fbody.style.removeProperty('padding');
-                fbody.style.removeProperty('margin');
-                fbody.style.cssText = `
+            const height = getHeight(fbody);
+            fbody.style.removeProperty('padding');
+            fbody.style.removeProperty('margin');
+            fbody.style.cssText = `
                     transition: all .3s;
                     max-height: ${height + 10}px;
                 `;
-                await onTransitionEnd(fbody);
-            } else {
-                fbody.style.cssText = `
-                    transition: all .3s;
-                    padding: 0;
-                    margin: 0;
-                    max-height: 0px;
-                `;
-            }
             await onTransitionEnd(fbody);
-            fbody.style.removeProperty('transition');
+
+            this.onBodyTransEnd();
+        },
+        hideBody() {
+            if (this.isTogglingBody)
+                return;
+
+            if (!this.isHideable) {
+                this.showBody();
+                return;
+            }
+
+            this.isTogglingBody = true;
+            this.isBodyShown = false;
+
+            const fbody = this.$refs.filterBody;
+            fbody.style.cssText = `
+                transition: all .3s;
+                padding: 0;
+                margin: 0;
+                max-height: 0px;
+            `;
+
+            this.onBodyTransEnd();
         },
         writeComment(event) {
             const comment = this.$refs.comment.find(node => node.closest('li') === event.target.closest('li'));
@@ -110,7 +138,35 @@ export default {
         onCommentBlur(event) {
             event.target.removeAttribute('contenteditable');
         },
+        addToChecked(event, sectionTitle, value) {
+            let obj = this.checkedValues.find(o => o.title === sectionTitle);
+            if (!obj) {
+                obj = { title: sectionTitle, values: [] };
+                this.checkedValues.push(obj);
+            }
+
+            if (event.target.checked) {
+                obj.values.push(value);
+            } else {
+                const index = obj.values.indexOf(value);
+                obj.values.splice(index, 1);
+            }
+        }
     },
+    watch: {
+        async body() {
+            if (this.isBodyShown) {
+                await nextTick();
+                this.showBody(true);
+            }
+        },
+        checkedValues: {
+            deep: true,
+            handler() {
+                this.$emit('update:modelValue', this.checkedValues);
+            }
+        }
+    }
 }
 </script>
 
