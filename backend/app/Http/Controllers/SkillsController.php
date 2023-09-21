@@ -81,7 +81,6 @@ class SkillsController extends Controller
 
     public function destroy($id)
     {
-        \Illuminate\Support\Facades\Log::info($id);
         $skill = Skill::find($id);
         if (!$skill)
             return response(['error' => true]);

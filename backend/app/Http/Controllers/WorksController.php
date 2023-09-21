@@ -225,8 +225,6 @@ class WorksController extends Controller
     {
         $fields = $this->validateRequest($request);
 
-        \Illuminate\Support\Facades\Log::info($fields);
-
         // если передан $work, обновить запись work
         if ($work) {
             $work->update($fields);
@@ -306,7 +304,6 @@ class WorksController extends Controller
     public function destroy($id)
     {
         $work = Work::find($id);
-        \Illuminate\Support\Facades\Log::info($work);
         if (!$work)
             return ['error' => true];
 
