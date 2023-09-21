@@ -160,6 +160,8 @@ export default {
                     this.$router.push({ name: 'EditSkill', params: { id: res.data.id } });
                 }
             } catch (err) { }
+
+            this.afterAnyAction();
         },
         async update() {
             if (this.checkIfUploading('update'))
@@ -176,6 +178,8 @@ export default {
                     store.isLoading = false;
                 }
             } catch (err) { }
+
+            this.afterAnyAction();
         },
         async remove() {
             if (!this.skillData)
@@ -186,12 +190,18 @@ export default {
 
             try {
                 const res = await axios.delete(`${import.meta.env.VITE_API_LINK}skill/${this.skillData.id}`);
-                if (res && res.data && res.data.deleted) {
+                if (!res.data.error) {
                     store.isLoading = false;
                     this.$router.push({ name: 'AddSkill' });
                 }
             } catch (err) { }
+
+            this.afterAnyAction();
         },
+        afterAnyAction() {
+            const store = useMyStore();
+            store.loadAllData();
+        }
     },
     computed: {
         imageData() {

@@ -84,9 +84,8 @@ class SkillsController extends Controller
         \Illuminate\Support\Facades\Log::info($id);
         $skill = Skill::find($id);
         if (!$skill)
-            return response(['not_found' => true]);
+            return response(['error' => true]);
 
         $skill->delete();
-        return response(['deleted' => true]);
     }
 }

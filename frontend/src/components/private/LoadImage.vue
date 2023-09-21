@@ -3,13 +3,13 @@
         <div class="load-media__title" @click="openExplorer">
             {{ title }}
             <Transition name="scale-up">
-                <button v-if="loadedImageSrc" class="load-media__cancel icon-cancel" @click.stop="removeImage"></button>
+                <button v-if="imageSrc" class="load-media__cancel icon-cancel" @click.stop="removeImage"></button>
             </Transition>
         </div>
-        <div class="load-media__container" :class="{ 'load-media__container--loaded': loadedImageSrc }"
+        <div class="load-media__container" :class="{ 'load-media__container--loaded': imageSrc }"
             ref="loadedImageContainer" @click.self="openExplorer">
             <Transition name="scale-up" mode="out-in">
-                <img v-if="loadedImageSrc" :src="loadedImageSrc">
+                <img v-if="imageSrc" :src="imageSrc">
                 <span v-else class="icon-add-image" @click.self="openExplorer"></span>
             </Transition>
         </div>
@@ -24,12 +24,6 @@ import axios from 'axios';
 export default {
     name: 'LoadImage',
     props: {
-        width: {
-            type: [String, Number]
-        },
-        height: {
-            type: [String, Number]
-        },
         title: {
             type: String,
             default: 'Загрузка изображения'
@@ -42,21 +36,20 @@ export default {
     emits: ['update:modelValue', 'update:isUploading'],
     data() {
         return {
-            loadedImageSrc: null,
-            loadedImageId: null,
+            imageSrc: null,
             isLoading: false,
             imageId: null,
-            isUploading: false
+            isUploading: false,
         }
     },
     methods: {
         async loadImageData() {
             if (this.placeholderData) {
-                this.loadedImageId = this.placeholderData.id;
-                this.loadedImageSrc = `${import.meta.env.VITE_BACKEND_LINK}${this.placeholderData.path}`;
+                this.imageId = this.placeholderData.id;
+                this.imageSrc = `${import.meta.env.VITE_BACKEND_LINK}${this.placeholderData.path}`;
             } else {
-                this.loadedImageId = null;
-                this.loadedImageSrc = null;
+                this.imageId = null;
+                this.imageSrc = null;
             }
         },
         openExplorer() {
@@ -70,7 +63,7 @@ export default {
 
             const reader = new FileReader();
             reader.onload = () => {
-                this.loadedImageSrc = reader.result;
+                this.imageSrc = reader.result;
             };
             reader.readAsDataURL(file);
 
@@ -106,7 +99,7 @@ export default {
             this.isUploading = false;
         },
         async removeImage() {
-            this.loadedImageSrc = null;
+            this.imageSrc = null;
             this.$refs.input.files = new DataTransfer().files;
 
             if (!this.imageId)

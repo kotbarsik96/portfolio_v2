@@ -12,6 +12,7 @@ use App\Models\WorksTypes;
 use App\Models\Tag;
 use App\Models\Stack;
 use App\Models\Image;
+use App\Http\Controllers\TablesController;
 
 class WorksController extends Controller
 {
@@ -148,21 +149,94 @@ class WorksController extends Controller
             if (array_key_exists('description', $obj))
                 $fields['description'] = $obj['description'];
 
-            $params['modelToCreate']::create($fields);
+            $existing = $params['modelToCreate']::where('work_id', $params['workId'])
+                ->where($params['addingColumnName'], $obj['id'])
+                ->first();
+            // если запись существует, обновить
+            if ($existing)
+                $existing->update($fields);
+            // иначе создать новую
+            else
+                $params['modelToCreate']::create($fields);
         }
         return true;
     }
-    
-    public function store(Request $request, $id = null)
+
+    /* Удаляет связи "многие-ко-многим"; делает обратное storeCheckedValues. В $exceptions можно передать id или title тех значений из таблиц, которые не нужно удалять в формате:
+        $exceptions = ['types' => [3, 15, 'Верстка по макету']] - здесь из таблицы works_types не будут удалены записи, где type_id равен числу из works_types, либо 
+    */
+    public function removeCheckedValues($work, $exceptions = [])
+    {
+        $deletable = [
+            ['binderTable' => 'works_types', 'table' => 'types', 'id_column_name' => 'type_id'],
+            ['binderTable' => 'works_skills', 'table' => 'skills', 'id_column_name' => 'skill_id'],
+            ['binderTable' => 'works_stack', 'table' => 'stack', 'id_column_name' => 'stack_id'],
+        ];
+
+        // превратить все title, переданные в exceptions, в id-шники
+        foreach ($exceptions as $tableName => $array) {
+            $eloquent = TablesController::getTableEloquent($tableName);
+            if (!$eloquent)
+                continue;
+
+            foreach ($array as $key => $titleOrId) {
+                if (is_numeric($titleOrId))
+                    continue;
+
+                $data = $eloquent::where('title', $titleOrId)->first();
+                if (!$data)
+                    continue;
+
+                $array[$key] = $data->id;
+            }
+            $exceptions[$tableName] = $array;
+        }
+
+        foreach ($deletable as $data) {
+            $binderModel = TablesController::getTableEloquent($data['binderTable']);
+
+            // коллекция строк из works_<taxonomy>
+            $collection = $binderModel::where('work_id', $work->id)->get();
+            // исключения для текущей таблицы
+            $currentExceptions = array_key_exists($data['table'], $exceptions)
+                ? $exceptions[$data['table']]
+                : [];
+
+            foreach ($collection as $obj) {
+                $idColumnName = $data['id_column_name'];
+                $checkedValueId = $obj->$idColumnName;
+
+                // если есть в исключениях, не удалять
+                if (is_numeric(array_search($checkedValueId, $currentExceptions)))
+                    continue;
+
+                $obj->delete();
+            }
+        }
+    }
+
+    /* метод может: 
+        1. создать новую запись work: в таком случае НЕ передается $id
+        2. обновить существующую запись work: в таком случае передается $id (вызывается в update)
+    */
+    public function store(Request $request, $work = null)
     {
         $fields = $this->validateRequest($request);
 
-        $isTitleExists = Work::where('title', $fields['title'])->first();
-        if ($isTitleExists)
-            return response(['exists' => true]);
+        // если передан $work, обновить запись work
+        if ($work) {
+            $work->update($fields);
+        }
+        // добавить новую запись work, предварительно проверив, что такой работы нет
+        else {
+            $isTitleExists = Work::where('title', $fields['title'])->first();
+            if ($isTitleExists)
+                return response(['exists' => true]);
 
-        $work = Work::create($fields);
+            $work = Work::create($fields);
+        }
 
+        // добавляет таксономии, прикрепленные скрины и навыки
         $checkedValues = $request['checkedValues'];
         if (is_array($checkedValues)) {
             foreach ($checkedValues as $obj) {
@@ -207,15 +281,32 @@ class WorksController extends Controller
 
     public function update(Request $request, $id)
     {
-        $fields = $this->validateRequest($request);
-
         $work = Work::find($id);
-        if ($work) {
-            // $work->update()
+        if (!$work)
+            return response(['error' => true]);
+
+        // удалить лишние "многие-ко-многим" связи
+        $exceptions = [];
+        foreach ($request['checkedValues'] as $assoc) {
+            $exceptions[$assoc['name']] = array_map(fn($valueAssoc) => $valueAssoc['value'], $assoc['values']);
         }
+        $this->removeCheckedValues($work, $exceptions);
+
+        $updatedWork = $this->store($request, $work);
+        if (is_array($updatedWork))
+            return $this->single($id);
+
+        return $this->single($updatedWork->id);
     }
 
-    public function destroy()
+    public function destroy($id)
     {
+        $work = Work::find($id);
+        \Illuminate\Support\Facades\Log::info($work);
+        if (!$work)
+            return ['error' => true];
+
+        $this->removeCheckedValues($work);
+        $work->delete();
     }
 }

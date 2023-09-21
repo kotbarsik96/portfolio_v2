@@ -101,15 +101,17 @@ export default {
 
             const data = { title: this.newTaxValue };
             const url = `${import.meta.env.VITE_API_LINK}taxonomy/${this.taxonomyTitle}`;
-            const res = await axios.post(url, data);
+            try {
+                const res = await axios.post(url, data);
 
-            store.isLoading = false;
-            if (res.data.error) {
-                return;
-            }
+                store.isLoading = false;
+                if (!res.data.error) {
+                    this.$refs.addTaxInput.value = '';
+                    this.loadTaxonomies();
+                }
+            } catch (err) { }
 
-            this.$refs.addTaxInput.value = '';
-            this.loadTaxonomies();
+            this.afterAnyAction();
         },
         onChangeTax(value, oldValue, initialValue) {
             this.taxonomies = this.taxonomies.map(obj => {
@@ -132,9 +134,12 @@ export default {
             store.isLoading = true;
 
             const url = `${import.meta.env.VITE_API_LINK}taxonomies/${this.taxonomyTitle}`;
-            await axios.post(url, { taxonomies });
-            this.loadTaxonomies();
+            try {
+                await axios.post(url, { taxonomies });
+                this.loadTaxonomies();
+            } catch (err) { }
 
+            this.afterAnyAction();
             store.isLoading = false;
         },
         async onRemoveTax(value) {
@@ -143,8 +148,16 @@ export default {
                 return;
 
             const url = `${import.meta.env.VITE_API_LINK}taxonomy/${this.taxonomyTitle}/${obj.id}`;
-            await axios.delete(url);
-            this.loadTaxonomies();
+            try {
+                await axios.delete(url);
+                this.loadTaxonomies();
+            } catch (err) { }
+
+            this.afterAnyAction();
+        },
+        afterAnyAction() {
+            const store = useMyStore();
+            store.loadAllData();
         },
         doSearch() {
             const query = this.searchValue.trim();

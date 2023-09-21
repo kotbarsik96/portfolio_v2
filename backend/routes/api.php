@@ -9,6 +9,7 @@ use App\Http\Controllers\WorksController;
 use App\Http\Controllers\ImagesController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\SkillsController;
+use App\Http\Controllers\DataController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,10 +35,12 @@ Route::get('/skill/{id}', [SkillsController::class, 'single']);
 
 Route::get('/taxonomies/{title}', [TaxonomiesController::class, 'all']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    // test if user is authorized
-    Route::post('/check-auth', [AuthController::class, 'checkAuth']);
+Route::get('/alldata', [DataController::class, 'all']);
 
+// test if user is authorized
+Route::post('/check-auth', [AuthController::class, 'checkAuth']);
+
+Route::middleware('auth:sanctum')->group(function () {
     // works
     Route::post('/work', [WorksController::class, 'store']);
     Route::post('/work/{id}', [WorksController::class, 'update']);

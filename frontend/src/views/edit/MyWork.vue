@@ -183,15 +183,28 @@ export default {
                 const url = `${import.meta.env.VITE_API_LINK}work/${id}`;
                 const data = this.getDataToUpload();
                 const res = await axios.post(url, data);
-                console.log(res);
                 if (res.data.id) {
                     this.workData = res.data;
                 }
             } catch (err) { }
 
             store.isLoading = false;
+            this.afterAnyAction();
         },
-        async remove() { },
+        async remove() {
+            const url = `${import.meta.env.VITE_API_LINK}work/${this.workData.id}`;
+            const store = useMyStore();
+            store.isLoading = true;
+            try {
+                const res = await axios.delete(url);
+                if(!res.data.error) {
+                    this.$router.push({ name: 'AddWork' });
+                }
+            } catch (err) { }
+
+            store.isLoading = false;
+            this.afterAnyAction();
+        },
         async load() {
             const store = useMyStore();
             const data = this.getDataToUpload();
@@ -206,7 +219,12 @@ export default {
             } catch (err) { }
 
             store.isLoading = false;
+            this.afterAnyAction();
         },
+        afterAnyAction() {
+            const store = useMyStore();
+            store.loadAllData();
+        }
         //================ rest api - конец
     },
 }
