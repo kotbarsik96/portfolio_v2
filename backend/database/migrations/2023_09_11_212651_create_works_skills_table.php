@@ -23,7 +23,7 @@ return new class extends Migration
                 ->constrained(table: 'skills')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
-            $table->longText('description');
+            $table->longText('description')->nullable();
         });
     }
 
