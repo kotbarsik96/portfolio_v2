@@ -94,12 +94,14 @@ class WorksController extends Controller
 
         $fields = $request->validate([
             'title' => 'required|min:3|string',
+            'url' => 'active_url',
             'tag_id' => 'required|numeric',
             'image_desktop_id' => 'numeric|nullable',
             'image_mobile_id' => 'numeric|nullable'
         ]);
         $fields = [
             'title' => trim($request['title']),
+            'url' => trim($request['url']),
             'tag_id' => $request['tag_id'],
             'image_desktop_id' => $request['image_desktop_id'],
             'image_mobile_id' => $request['image_mobile_id'],
@@ -222,6 +224,8 @@ class WorksController extends Controller
     public function store(Request $request, $work = null)
     {
         $fields = $this->validateRequest($request);
+
+        \Illuminate\Support\Facades\Log::info($fields);
 
         // если передан $work, обновить запись work
         if ($work) {

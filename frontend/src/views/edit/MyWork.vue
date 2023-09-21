@@ -10,6 +10,10 @@
                     name="work_title" :defaultValue="workData.title" v-model="workTitle"></InputItem>
             </div>
             <div class="add__inputs-section">
+                <InputItem class="input-item--full" ref="urlInput" label="URL" placeholder="URL" id="work-url"
+                    name="work_url" :defaultValue="workData.url" v-model="workUrl"></InputItem>
+            </div>
+            <div class="add__inputs-section">
                 <div class="input-item">
                     <span class="input-item__label">
                         Тег
@@ -101,6 +105,7 @@ export default {
         return {
             workData: {},
             workTitle: '',
+            workUrl: '',
             tagValue: '',
             imageDesktopId: null,
             imageMobileId: null,
@@ -130,6 +135,7 @@ export default {
         // загрузить все данные
         nullifyData() {
             this.workData = {};
+            this.workUrl = '';
             this.tagValue = ''
             this.workTitle = '';
             this.tagValue = '';
@@ -165,6 +171,7 @@ export default {
         getDataToUpload() {
             return {
                 title: this.workTitle,
+                url: this.workUrl,
                 checkedValues: this.checkedValues,
                 tag: this.tagValue,
                 image_desktop_id: this.imageDesktopId,
