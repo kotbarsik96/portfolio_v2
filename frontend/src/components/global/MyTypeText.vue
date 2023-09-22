@@ -145,6 +145,11 @@ export default {
             });
         }
     },
+    watch: {
+        text(){
+            console.log(this.text);
+        }
+    }
 }
 </script>
 

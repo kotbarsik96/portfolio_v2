@@ -26,7 +26,7 @@
                     </div>
                 </div>
             </div>
-            <video class="video-player__video" :src="src" muted loop preload="metadata" ref="video"
+            <video class="video-player__video" :src="videoSrc" muted loop preload="metadata" ref="video"
                 @loadedmetadata="onVideoLoad" @timeupdate="onTimeupdate" @click="pauseOrPlay"></video>
         </div>
     </div>
@@ -48,9 +48,28 @@ export default {
         this.$refs.scale.ondragstart = () => false;
         this.$refs.bar.ondragstart = () => false;
         this.$refs.toddler.ondragstart = () => false;
+
+        this.intersectionObs = new IntersectionObserver((entries) => {
+            for  (let entry of entries) {
+                if  (entry.target === this.$el) {
+                    if  (entry.isIntersecting) {
+                        this.videoSrc = this.src;
+                        this.intersectionObs.disconnect();
+                    }
+                    break;
+                }
+            }
+        }, {
+            root: null,
+            threshold: 0.2
+        });
+        this.intersectionObs.observe(this.$el);
     },
     data() {
         return {
+            intersectionObs: null,
+            // меняется благодаря IntersectionObserver
+            videoSrc: '',
             isPlaying: false,
             isVideoInitted: false,
             durationTime: '00:00',

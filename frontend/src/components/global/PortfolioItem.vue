@@ -30,7 +30,7 @@
             </div>
         </div>
         <div class="portfolio-item__text">
-            <a href="#">
+            <a :href="data.url">
                 <span class="portfolio-item__title">
                     {{ data.tag }} {{ data.title }}
                 </span>

@@ -29,7 +29,7 @@
                                 Стек:
                             </span>
                             <span class="list__item-content">
-                                <MyTypeText text="HTML/CSS, чистый Javascript, Vue JS 3, Gulp, Vite, PHP, Wordpress" queue></MyTypeText>
+                                <MyTypeText :text="stack" queue></MyTypeText>
                             </span>
                         </li>
                         <li class="list__item icon-portfolio">
@@ -46,7 +46,8 @@
                         </li>
                     </ul>
                     <p class="about__text-par">
-                        На этом сайте я собрал свои работы, которые могу опубликовать. Так я чётко могу увидеть свой прогресс и продемонстрировать его тем, кто заинтересован в работе со мной
+                        На этом сайте я собрал свои работы, которые могу опубликовать. Так я чётко могу увидеть свой
+                        прогресс и продемонстрировать его тем, кто заинтересован в работе со мной
                     </p>
                     <p class="about__text-par">
                         Я работаю и с чистым JS, и с фреймворком Vue JS
@@ -66,15 +67,28 @@
 <script>
 import avatar from '@/assets/images/about/avatar.png';
 import MyTypeText from '../MyTypeText.vue';
+import { mapState } from 'pinia';
+import { useMyStore } from '@/stores/store.js';
 
 export default {
     name: 'AboutMe',
+    components: { MyTypeText },
     data() {
         return {
             avatar
         };
     },
-    components: { MyTypeText }
+    computed: {
+        ...mapState(useMyStore, ['taxonomies']),
+        stack() {
+            if (!this.taxonomies.stack)
+                return '';
+
+            return this.taxonomies.stack
+                .map(obj => obj.title)
+                .join(', ');
+        }
+    },
 }
 </script>
 
