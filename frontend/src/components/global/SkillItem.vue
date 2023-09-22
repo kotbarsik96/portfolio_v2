@@ -15,13 +15,15 @@
             <div class="skill-item__folder-back" :style="{ backgroundImage: folderBackgroundBack }">
             </div>
             <div class="skill-item__links">
-                <ol class="skill-item__links-list" ref="linksList"></ol>
-                <div v-if="linksPages.length > 0" class="skill-item__links-pagination">
-                    <button class="skill-item__links-prev icon-chevron-right" type="button"
-                        @click="turnOverLinksPage('prev')"></button>
+                <div class="skill-item__links-container">
+                    <ol class="skill-item__links-list" ref="linksList" v-html="currentShownLinks"></ol>
+                </div>
+                <div v-if="slicedLinksPages.length > 1" class="skill-item__links-pagination">
+                    <button class="skill-item__links-prev icon-chevron-right" type="button" @click="linksPageNumber--"
+                        :disabled="isFirstLinksPage"></button>
                     <span>|</span>
-                    <button class="skill-item__links-next icon-chevron-right" type="button"
-                        @click="turnOverLinksPage('next')"></button>
+                    <button class="skill-item__links-next icon-chevron-right" type="button" @click="linksPageNumber++"
+                        :disabled="isLastLinksPage"></button>
                 </div>
             </div>
             <div class="skill-item__media-container" ref="mediaContainer">
@@ -69,20 +71,8 @@ export default {
         return {
             theme: '',
             isShownLinks: true,
-            linksList: [
-                'AudioFreeDesign (на странице товара)',
-                'Flowers Club (в карточке товара, в описании)',
-                'Webovio',
-                'Streetster (связаны с кружочками выбора цвета)',
-                'Freshnesecom (на странице товара)',
-                'Freshnesecom (на странице товара)',
-                'Webovio',
-                'Streetster (связаны с кружочками выбора цвета)',
-                'Flowers Club (в карточке товара, в описании)',
-                'AudioFreeDesign (на странице товара)',
-            ],
-            linksPages: [],
             linksPageNumber: 1,
+            slicedLinksPages: [],
             mediaType: '',
         }
     },
@@ -136,91 +126,62 @@ export default {
             this.mediaType = mediaType;
         },
         sliceLinksPages() {
-            const self = this;
-            if (!this.$refs.linksList) return;
+            const linksList = this.$refs.linksList;
+            if (!linksList)
+                return;
 
-            const linksListClone = this.$refs.linksList.cloneNode();
-            const origStyles = getComputedStyle(linksListClone);
-            const origWidth = this.$refs.linksList.offsetWidth < 100
-                ? 250 : this.$refs.linksList.offsetWidth;
-            linksListClone.style.cssText = `
-                width: ${origWidth}px;
+            const width = linksList.offsetWidth;
+            const maxHeight = linksList.offsetHeight;
+            const linksListClone = linksList.cloneNode();
+            const origStyles = getComputedStyle(linksList);
+            linksListClone.style.cssText = `   
+                width: ${width}px;
+                line-height: ${origStyles.lineHeight};
+                font-size: ${origStyles.fontSize};
+                height: auto;
                 position: absolute;
-                top: 0;
-                left: 0;
                 opacity: 0;
                 z-index: -999;
-                font-size: ${origStyles.fontSize};
+                font-family: ${origStyles.fontFamily};
+                top: 0;
+                left: 0;
             `;
             document.body.append(linksListClone);
-
-            let i = 0;
-            let linkItem = this.linksList[i];
-            this.linksPages = [];
-
-            const coef = window.matchMedia('(max-width: 479px)').matches
-                ? 2.5 : 1.85;
-            const maxHeight = this.$refs.itemContainer.offsetHeight / coef;
-            createLinksPage();
-            this.setLinksPage();
-            linksListClone.remove();
-
-            function createLinksPage() {
-                let array = [];
-                while (linkItem && linksListClone.offsetHeight < maxHeight) {
-                    const li = createElement('li', 'skill-item__link-item', `
-                        <a class="link" href="#">${i + 1}. ${linkItem}</a>
-                    `);
-                    linksListClone.append(li);
-                    array.push(li);
-                    i++;
-                    linkItem = self.linksList[i];
-                }
-                if (linksListClone.offsetHeight > maxHeight) {
-                    const lastItem = linksListClone.querySelector(".skill-item__link-item:last-child");
-                    if (!lastItem)
-                        return;
-
-                    lastItem.remove();
-                    array = array.slice(0, array.length - 1);
-                    i--;
-                    linkItem = self.linksList[i];
-                }
-                self.linksPages.push(array);
-                linksListClone.innerHTML = "";
-
-                if (linkItem)
-                    createLinksPage();
-            }
-        },
-        setLinksPage(pageNumber = 1) {
-            const linksList = this.$refs.linksList;
-            let page = this.linksPages[pageNumber - 1];
-            if (!page)
-                page = this.linksPages[this.linksPages.length - 1];
-
-            this.linksPageNumber = this.linksPages.findIndex(arr => arr[0] === page[0]) + 1;
-
-            doInFade(linksList, () => {
-                linksList.innerHTML = "";
-                page.forEach(li => linksList.append(li));
-                linksList.style.opacity = "1";
+            const skillsArray = this.data.links.map(obj => {
+                const description = obj.description ? `(${obj.description})` : '';
+                return `<a href="${obj.url}">${obj.title}${description}</a>`;
             });
-        },
-        turnOverLinksPage(action) {
-            switch (action) {
-                case 'prev':
-                    if (this.linksPageNumber <= 1)
-                        return;
-                    this.linksPageNumber--;
-                    break;
-                case 'next':
-                    if (this.linksPageNumber >= this.linksPages.length)
-                        return;
-                    this.linksPageNumber++;
-                    break;
+            let skillsPages = [];
+
+            let number = 1;
+            // функция будет вызываться, пока не заполнятся все страницы в skillsPages
+            createPage();
+            linksListClone.remove();
+            this.slicedLinksPages = skillsPages;
+
+            function createPage() {
+                let page = [];
+                linksListClone.innerHTML = '';
+                while (skillsArray[0] && linksListClone.offsetHeight <= maxHeight) {
+                    const newItem = `
+                        <li class="skill-item__link-item">${number}. ${skillsArray[0]}</li>`;
+                    linksListClone.innerHTML += newItem;
+
+                    if (linksListClone.offsetHeight <= maxHeight) {
+                        page.push(newItem);
+                        skillsArray.splice(0, 1);
+                        number++;
+                    } else {
+                        break;
+                    }
+                }
+
+                if (page.length > 0)
+                    skillsPages.push(page);
+
+                if (skillsArray[0])
+                    createPage();
             }
-            this.setLinksPage(this.linksPageNumber);
         },
     },
     computed: {
@@ -259,6 +220,45 @@ export default {
 
             return null;
         },
+        currentShownLinks() {
+            const lList = this.$refs.linksList;
+            if (lList) {
+                lList.style.cssText = `opacity: 0; transition: all 0s;`;
+                setTimeout(async () => {
+                    lList.style.cssText = 'opacity: 1; transition: all .5s;';
+                    await onTransitionEnd(lList);
+                    lList.style.removeProperty('opacity');
+                    lList.style.removeProperty('transition');
+                }, 0);
+            }
+
+            if (this.slicedLinksPages.length < 1)
+                return 'Не добавлены сайты, где реализован этот навык';
+
+            const page = this.slicedLinksPages[this.linksPageNumber - 1];
+            if (!page)
+                return this.slicedLinksPages[0] ?
+                    this.slicedLinksPages[0].join('') : ''
+                    || '';
+
+
+            return page.join('');
+        },
+        isFirstLinksPage() {
+            return this.linksPageNumber === 1;
+        },
+        isLastLinksPage() {
+            return this.linksPageNumber === this.slicedLinksPages.length;
+        }
     },
+    watch: {
+        linksPageNumber(num) {
+            if (num < 1)
+                this.linksPageNumber = 1;
+
+            if (num > this.slicedLinksPages.length)
+                this.linksPageNumber = this.slicedLinksPages.length;
+        }
+    }
 }
 </script>

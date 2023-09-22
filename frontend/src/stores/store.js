@@ -34,9 +34,10 @@ export const useMyStore = defineStore("myStore", {
                 }
 
                 this.isMe = false;
+                this.logout();
                 return false;
             } catch (err) {
-                // console.error(err);
+                
             }
         },
         async logout() {

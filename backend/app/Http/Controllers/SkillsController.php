@@ -2,13 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\WorksSkills;
 use Illuminate\Http\Request;
 use App\Models\Skill;
 use App\Models\Video;
 use App\Models\Image;
+use App\Models\Work;
 
 class SkillsController extends Controller
 {
+    public function getWorksLinks($skill)
+    {
+        $worksSkills = WorksSkills::where('skill_id', $skill->id)->get();
+        $links = [];
+        foreach ($worksSkills as $obj) {
+            $work = Work::find($obj->work_id);
+            if (!$work)
+                continue;
+
+            $links[] = ['title' => $work->title, 'link' => $work->url, 'description' => $obj->description];
+        }
+
+        return $links;
+    }
+
     public function all()
     {
         $skills = Skill::all();
@@ -17,6 +34,8 @@ class SkillsController extends Controller
                 $skill->video = Video::find($skill->video_id);
             if (is_numeric($skill->image_id))
                 $skill->image = Image::find($skill->image_id);
+
+            $skill->links = $this->getWorksLinks($skill);
         }
         return $skills;
     }
@@ -44,7 +63,7 @@ class SkillsController extends Controller
             }
         }
 
-        // сюда добавить $skill->links, в которую сложить данные из таблицы works_skills, предварительно получив только данные о конкретном навыке
+        $skill->links = $this->getWorksLinks($skill);
 
         return response($skill);
     }

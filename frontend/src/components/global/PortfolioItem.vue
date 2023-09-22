@@ -14,13 +14,15 @@
             <div class="portfolio-item__folder-back" :style="{ backgroundImage: folderBackgroundBack }">
             </div>
             <div class="portfolio-item__skills">
-                <ol class="portfolio-item__skills-list" ref="skillsList"></ol>
-                <div v-if="skillsPages.length > 0" class="portfolio-item__skills-pagination">
-                    <button class="portfolio-item__skills-prev icon-chevron-right" type="button"
-                        @click="turnOverSkillsPage('prev')"></button>
+                <div class="portfolio-item__skills-container">
+                    <ol class="portfolio-item__skills-list" v-html="currentShownSkills" ref="skillsList"></ol>
+                </div>
+                <div v-if="slicedSkillsPages.length > 0" class="portfolio-item__skills-pagination">
+                    <button class="portfolio-item__skills-prev icon-chevron-right" type="button" @click="skillsPageNumber--"
+                        :disabled="isFirstSkillsPage"></button>
                     <span>|</span>
-                    <button class="portfolio-item__skills-next icon-chevron-right" type="button"
-                        @click="turnOverSkillsPage('next')"></button>
+                    <button class="portfolio-item__skills-next icon-chevron-right" type="button" @click="skillsPageNumber++"
+                        :disabled="isLastSkillsPage"></button>
                 </div>
             </div>
             <div class="portfolio-item__image" ref="imageContainer">
@@ -46,7 +48,7 @@
 <script>
 import { useMyStore } from '@/stores/store.js';
 import { mapState } from 'pinia';
-import { onTransitionEnd, createElement, doInFade } from '@/assets/scripts/scripts.js';
+import { onTransitionEnd } from '@/assets/scripts/scripts.js';
 
 import folderBackUrl from '@/assets/images/portfolio-item/folder-back.png';
 import folderFrontUrl from '@/assets/images/portfolio-item/folder-front.png';
@@ -58,7 +60,7 @@ export default {
     props: {
         data: {
             type: Object,
-            required: true
+            required: true,
         }
     },
     mounted() {
@@ -79,8 +81,8 @@ export default {
             theme: '',
             imageType: 'desktop',
             isShownSkills: false,
-            skillsPages: [],
-            skillsPageNumber: 1
+            skillsPageNumber: 1,
+            slicedSkillsPages: [],
         }
     },
     methods: {
@@ -138,90 +140,57 @@ export default {
             }
         },
         sliceSkillsPages() {
-            const self = this;
-            if (!this.$refs.skillsList) return;
+            const skillsList = this.$refs.skillsList;
+            if (!skillsList)
+                return;
 
-            const skillsListClone = this.$refs.skillsList.cloneNode();
-            const origStyles = getComputedStyle(skillsListClone);
-            const origWidth = this.$refs.skillsList.offsetWidth < 100
-                ? 250 : this.$refs.skillsList.offsetWidth;
-            skillsListClone.style.cssText = `
-                width: ${origWidth}px;
+            const width = skillsList.offsetWidth;
+            const maxHeight = skillsList.offsetHeight;
+            const skillsListClone = skillsList.cloneNode();
+            const origStyles = getComputedStyle(skillsList);
+            skillsListClone.style.cssText = `   
+                width: ${width}px;
+                line-height: ${origStyles.lineHeight};
+                font-size: ${origStyles.fontSize};
+                height: auto;
                 position: absolute;
-                top: 0;
-                left: 0;
                 opacity: 0;
                 z-index: -999;
-                font-size: ${origStyles.fontSize};
+                font-family: ${origStyles.fontFamily};
+                top: 0;
+                left: 0;
             `;
             document.body.append(skillsListClone);
+            const skillsArray = this.skillsList.map(str => str);
+            let skillsPages = [];
 
-            let i = 0;
-            let skillItem = this.skillsList[i];
-            this.skillsPages = [];
-
-            const coef = window.matchMedia('(max-width: 479px)').matches
-                ? 2.5 : 2;
-            const maxHeight = this.$refs.itemContainer.offsetHeight / coef;
-            createSkillPage();
-            this.setSkillsPage();
+            // функция будет вызываться, пока не заполнятся все страницы в skillsPages
+            createPage();
+            this.slicedSkillsPages = skillsPages;
             skillsListClone.remove();
 
-            function createSkillPage() {
-                let array = [];
-                while (skillItem && skillsListClone.offsetHeight < maxHeight) {
-                    const li = createElement('li', 'portfolio-item__skill-item', `${i + 1}. ${skillItem}`);
-                    skillsListClone.append(li);
-                    array.push(li);
-                    i++;
-                    skillItem = self.skillsList[i];
-                }
-                if (skillsListClone.offsetHeight > maxHeight) {
-                    const lastItem = skillsListClone.querySelector(".portfolio-item__skill-item:last-child");
-                    if (!lastItem)
-                        return;
+            function createPage() {
+                let page = [];
+                skillsListClone.innerHTML = '';
+                while (skillsArray[0] && skillsListClone.offsetHeight <= maxHeight) {
+                    const newItem = `<li>${skillsArray[0]}</li>`;
+                    skillsListClone.innerHTML += newItem;
 
-                    lastItem.remove();
-                    array = array.slice(0, array.length - 1);
-                    i--;
-                    skillItem = self.skillsList[i];
+                    if (skillsListClone.offsetHeight <= maxHeight) {
+                        page.push(newItem);
+                        skillsArray.splice(0, 1);
+                    } else {
+                        break;
+                    }
                 }
-                self.skillsPages.push(array);
-                skillsListClone.innerHTML = "";
 
-                if (skillItem)
-                    createSkillPage();
+                if (page.length > 0)
+                    skillsPages.push(page);
+
+                if (skillsArray[0])
+                    createPage();
             }
         },
-        setSkillsPage(pageNumber = 1) {
-            const skillsList = this.$refs.skillsList;
-            let page = this.skillsPages[pageNumber - 1];
-            if (!page)
-                page = this.skillsPages[this.skillsPages.length - 1];
-
-            this.skillsPageNumber = this.skillsPages.findIndex(arr => arr[0] === page[0]) + 1;
-
-            doInFade(skillsList, () => {
-                skillsList.innerHTML = "";
-                page.forEach(li => skillsList.append(li));
-                skillsList.style.opacity = "1";
-            });
-        },
-        turnOverSkillsPage(action) {
-            switch (action) {
-                case 'prev':
-                    if (this.skillsPageNumber <= 1)
-                        return;
-                    this.skillsPageNumber--;
-                    break;
-                case 'next':
-                    if (this.skillsPageNumber >= this.skillsPages.length)
-                        return;
-                    this.skillsPageNumber++;
-                    break;
-            }
-            this.setSkillsPage(this.skillsPageNumber);
-        }
     },
     computed: {
         ...mapState(useMyStore, ['isMe']),
@@ -246,6 +215,32 @@ export default {
                 return `${obj.title}${descr}`;
             });
         },
+        currentShownSkills() {
+            const sList = this.$refs.skillsList;
+            if (sList) {
+                sList.style.cssText = `opacity: 0; transition: all 0s;`;
+                setTimeout(async () => {
+                    sList.style.cssText = 'opacity: 1; transition: all .5s;';
+                    await onTransitionEnd(sList);
+                    sList.style.removeProperty('opacity');
+                    sList.style.removeProperty('transition');
+                }, 0);
+            }
+
+            const page = this.slicedSkillsPages[this.skillsPageNumber - 1];
+            if (!page)
+                return this.slicedSkillsPages[0] ?
+                    this.slicedSkillsPages[0].join('') : ''
+                    || '';
+
+            return page.join('');
+        },
+        isFirstSkillsPage() {
+            return this.skillsPageNumber === 1;
+        },
+        isLastSkillsPage() {
+            return this.skillsPageNumber === this.slicedSkillsPages.length;
+        },
         stackList() {
             if (!this.data.stack)
                 return '';
@@ -262,6 +257,15 @@ export default {
                 return `${import.meta.env.VITE_BACKEND_LINK}${this.data.image_mobile.path}`;
 
             return null;
+        }
+    },
+    watch: {
+        skillsPageNumber(num) {
+            if (num < 1)
+                this.skillsPageNumber = 1;
+
+            if (num > this.slicedSkillsPages.length)
+                this.skillsPageNumber = this.slicedSkillsPages.length;
         }
     }
 }
