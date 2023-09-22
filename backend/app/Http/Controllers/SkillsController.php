@@ -20,7 +20,14 @@ class SkillsController extends Controller
             if (!$work)
                 continue;
 
-            $links[] = ['title' => $work->title, 'link' => $work->url, 'description' => $obj->description];
+            // если не указывать рядом с описанием ссылку на навык, будет взята ссылка на работу, связанную с этим навыком
+            $link = $obj->url ?? $work->url;
+
+            $links[] = [
+                'title' => $work->title,
+                'link' => $link,
+                'description' => $obj->description
+            ];
         }
 
         return $links;

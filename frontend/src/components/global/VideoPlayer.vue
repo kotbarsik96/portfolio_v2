@@ -1,7 +1,7 @@
 <template>
     <div class="video-player-container">
         <div class="video-player" :class="{ 'is-playing': isPlaying }">
-            <div class="video-player__controls" @click="onControlsClick">
+            <div class="video-player__controls" :style="{ backgroundColor: controlsBackgroundColor }" @click="onControlsClick">
                 <Transition name="fade-in">
                     <button v-if="isPlaying" class="video-player__pause-button icon-pause" type="button"></button>
                     <button v-else class="video-player__play-button icon-play-video" type="button"></button>
@@ -207,6 +207,14 @@ export default {
         }
         // конец - на весь экран
     },
+    computed: {
+        controlsBackgroundColor(){
+            if(this.isPlaying) 
+                return 'transparent';
+
+            return 'rgba(0, 0, 0, 0.25)';
+        }
+    }
 }
 </script>
 

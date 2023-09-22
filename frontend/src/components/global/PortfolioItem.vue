@@ -164,6 +164,7 @@ export default {
             const skillsArray = this.skillsList.map(str => str);
             let skillsPages = [];
 
+            let number = 1;
             // функция будет вызываться, пока не заполнятся все страницы в skillsPages
             createPage();
             this.slicedSkillsPages = skillsPages;
@@ -173,12 +174,13 @@ export default {
                 let page = [];
                 skillsListClone.innerHTML = '';
                 while (skillsArray[0] && skillsListClone.offsetHeight <= maxHeight) {
-                    const newItem = `<li>${skillsArray[0]}</li>`;
+                    const newItem = `<li>${number}. ${skillsArray[0]}</li>`;
                     skillsListClone.innerHTML += newItem;
 
                     if (skillsListClone.offsetHeight <= maxHeight) {
                         page.push(newItem);
                         skillsArray.splice(0, 1);
+                        number++;
                     } else {
                         break;
                     }

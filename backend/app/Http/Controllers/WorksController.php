@@ -16,21 +16,22 @@ use App\Http\Controllers\TablesController;
 
 class WorksController extends Controller
 {
+    public function getWorkDataByModel($array, $dataKey, $model)
+    {
+        foreach ($array as $key => $data) {
+            $obj = $model::find($data->$dataKey);
+            if (!$obj)
+                continue;
+
+            if ($data->description)
+                $obj->description = $data->description;
+            $array[$key] = $obj;
+        }
+        return $array;
+    }
+
     public function getWorkData($work)
     {
-        function getData($array, $dataKey, $model)
-        {
-            foreach ($array as $key => $data) {
-                $obj = $model::find($data->$dataKey);
-                if (!$obj)
-                    continue;
-
-                if ($data->description)
-                    $obj->description = $data->description;
-                $array[$key] = $obj;
-            }
-            return $array;
-        }
 
         if (is_numeric($work->tag_id))
             $work->tag = $this->getColumnById($work->tag_id, Tag::class);
@@ -44,11 +45,11 @@ class WorksController extends Controller
         $work->stack = WorksStack::where('work_id', $work->id)->get();
 
         if (count($work->types) > 0)
-            $work->types = getData($work->types, 'type_id', Type::class);
+            $work->types = $this->getWorkDataByModel($work->types, 'type_id', Type::class);
         if (count($work->skills) > 0)
-            $work->skills = getData($work->skills, 'skill_id', Skill::class);
+            $work->skills = $this->getWorkDataByModel($work->skills, 'skill_id', Skill::class);
         if (count($work->stack) > 0)
-            $work->stack = getData($work->stack, 'stack_id', Stack::class);
+            $work->stack = $this->getWorkDataByModel($work->stack, 'stack_id', Stack::class);
 
         return $work;
     }

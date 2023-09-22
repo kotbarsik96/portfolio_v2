@@ -489,18 +489,17 @@ label {
         z-index: 10;
         opacity: 1;
         visibility: visible;
-        background-color: rgba(0, 0, 0, 0.25);
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--video_controls_color);
-        transition-property: opacity, visibility;
+        transition-property: background-color, opacity, visibility;
         transition-delay: 0s;
     }
 
     &.is-playing &__controls {
         transition-duration: 0.2s;
-        transition-delay: 2s, 2.2s;
+        transition-delay: 0s, 2s, 2.2s;
         opacity: 0;
         visibility: hidden;
     }

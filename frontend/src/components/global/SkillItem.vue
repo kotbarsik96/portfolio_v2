@@ -149,7 +149,7 @@ export default {
             document.body.append(linksListClone);
             const skillsArray = this.data.links.map(obj => {
                 const description = obj.description ? `(${obj.description})` : '';
-                return `<a href="${obj.url}">${obj.title}${description}</a>`;
+                return `<a class="link" href="${obj.link}">${obj.title}${description}</a>`;
             });
             let skillsPages = [];
 
