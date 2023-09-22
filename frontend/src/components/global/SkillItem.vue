@@ -46,7 +46,7 @@
 <script>
 import { useMyStore } from '@/stores/store.js';
 import { mapState } from 'pinia';
-import { onTransitionEnd, createElement, doInFade, getCoords } from '@/assets/scripts/scripts.js';
+import { onTransitionEnd, getCoords } from '@/assets/scripts/scripts.js';
 import VideoPlayer from './VideoPlayer.vue';
 
 import folderBackUrl from '@/assets/images/portfolio-item/folder-back.png';

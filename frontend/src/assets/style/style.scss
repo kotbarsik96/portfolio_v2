@@ -1019,10 +1019,12 @@ label {
         position: relative;
         display: flex;
         flex-direction: column;
+        justify-content: center;
         align-items: center;
         z-index: 4;
         margin-bottom: 20px;
         height: 100%;
+        width: 65%;
         opacity: 0;
         visibility: hidden;
         transition-property: opacity, visibility;
@@ -1030,11 +1032,18 @@ label {
         transition-delay: 0s, 0.2s;
     }
 
+    &__skills-container {
+        margin-top: 40px;
+        width: 100%;
+        height: 60%;
+    }
+
     &__skills-list {
         position: relative;
-        max-width: 250px;
+        width: 100%;
+        height: 100%;
         text-align: center;
-        margin-top: 80px;
+        justify-content: center;
         margin-bottom: 5px;
         display: flex;
         flex-direction: column;

@@ -44,6 +44,7 @@ export function doInFade(element, callback = function () { }) {
             resolve();
         }
 
+        element.style.opacity = "1";
         await onTransitionEnd(element);
         element.style.removeProperty("transition");
 
