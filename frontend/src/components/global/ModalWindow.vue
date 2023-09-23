@@ -1,11 +1,15 @@
 <template>
-    <div class="modal-window">
+    <div class="modal-window" :class="[propsForModalWindow.modalClassNames]">
         <button class="modal-window__close icon-cancel" type="button" @click="removeSelf"></button>
         <h3 v-if="propsForModalWindow.title" class="modal-window__title">
             {{ propsForModalWindow.title }}
         </h3>
-        <div v-if="propsForModalWindow.body" class="modal-window__body">
-            {{ propsForModalWindow.body }}
+        <div v-if="modalBody && typeof modalBody === 'string'" v-html="modalBody" class="modal-window__body"></div>
+        <div v-if="modalBody && Array.isArray(modalBody)" class="modal-window__body">
+            <div v-for="comp in modalBody">
+                <component v-if="comp.type.name === 'TextInput'" :is="comp" v-model="textInputValue"></component>
+                <component v-else :is="comp"></component>
+            </div>
         </div>
         <div v-if="haveButtons" class="modal-window__buttons">
             <button v-if="propsForModalWindow.confirm" class="button" type="button" @click="onConfirmClick">
@@ -25,6 +29,26 @@ import { useModalsStore } from '@/stores/modals.js';
 export default {
     name: 'ModalWindow',
     props: {
+        /* propsForModalWindow: {
+            title: '',
+
+            body: 
+            ВАРИАНТ 1. передача строки: 
+            body: 'somestring, maybe <strong>even HTML</strong>',
+            ВАРИАНТ 2. передача массива: 
+                можно передать в массив компонент, сделанный через h(), например: 
+                    someComponent = h(SomeComponent, { propsValue1: 'test', propsValue2: 'test2' });
+
+            confirm: {
+                callback(){},
+                title: ''
+            },
+            decline: {
+                callback(){},
+                title: ''
+            },
+        }
+        */
         propsForModalWindow: {
             type: Object,
             default: {},
@@ -34,7 +58,7 @@ export default {
     data() {
         return {
             wasConfirmed: false,
-
+            textInputValue: ''
         }
     },
     methods: {
@@ -52,7 +76,7 @@ export default {
 
             if (typeof callback === 'function') {
                 const args = this.propsForModalWindow.confirm.args || {};
-                callback(args);
+                callback(this, args);
             }
 
             this.removeSelf();
@@ -62,7 +86,7 @@ export default {
                 ? this.propsForModalWindow.decline.callback : null;
             if (typeof callback === 'function') {
                 const args = this.propsForModalWindow.decline.args || {};
-                callback(args);
+                callback(this, args);
             }
 
             this.removeSelf(true);
@@ -72,6 +96,9 @@ export default {
         haveButtons() {
             return this.propsForModalWindow.confirm
                 || this.propsForModalWindow.decline;
+        },
+        modalBody() {
+            return this.propsForModalWindow.body;
         }
     }
 }

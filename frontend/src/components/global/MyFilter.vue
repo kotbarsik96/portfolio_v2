@@ -6,7 +6,7 @@
             </h4>
         </button>
         <div class="filter__body" ref="filterBody">
-            <div v-for="section in body" :key="section.title" class="filter__section">
+            <div v-for="section in body" :key="section.title" :data-section-name="section.name" class="filter__section">
                 <h5 class="filter__section-title">
                     {{ section.title }}
                 </h5>
@@ -14,16 +14,25 @@
                     <li v-for="value in section.values" :key="value" class="filter__section-item">
                         <label class="filter__section-label checkbox-label">
                             <input type="checkbox" ref="filterCheckbox" :name="section.name" :value="value"
-                                @change="addToChecked($event, section, value)">
+                                v-model="checkedValues">
                             <span class="checkbox-label__box"></span>
                             <span class="checkbox-label__text">
                                 {{ value }}
                             </span>
                         </label>
-                        <span v-if="section.allowComment" class="filter__section-item-comment editable" ref="comment"
-                            @blur="onCommentBlur" @input="onCommentInput($event, section)"></span>
-                        <button v-if="section.allowComment" class="filter__section-item-write-button icon-pencil"
-                            type="button" @click="writeComment"></button>
+                        <div v-if="isAnyAttachmentAllowed(section)" class="filter__section-item-buttons">
+                            <button v-if="section.allowComment" class="filter__section-item-write-button icon-pencil"
+                                type="button" @click="writeComment"></button>
+                            <button v-if="section.allowUrl" class="filter__section-item-url-button icon-attachment"
+                                @click="attachUrl"></button>
+                        </div>
+                        <div v-if="isAnyAttachmentAllowed(section)" class="filter__section-item-attachments">
+                            <span v-if="section.allowComment"
+                                class="filter__section-item-attachment filter__section-item-comment editable" ref="comment"
+                                @blur="onCommentBlur" @input="updateAttachments"></span>
+                            <a v-if="section.allowUrl" class="filter__section-item-attachment filter__section-item-url" ref="attachedUrl"
+                                href="#"></a>
+                        </div>
                     </li>
                 </ul>
             </div>
@@ -32,8 +41,10 @@
 </template>
 
 <script>
-import { getHeight, onTransitionEnd, setEditable, getTextContent } from '@/assets/scripts/scripts.js';
-import { nextTick } from 'vue';
+import { getHeight, onTransitionEnd, setEditable, delay } from '@/assets/scripts/scripts.js';
+import { nextTick, h } from 'vue';
+import { useModalsStore } from '@/stores/modals.js';
+import TextInput from './TextInput.vue';
 
 export default {
     name: 'MyFilter',
@@ -71,10 +82,43 @@ export default {
         return {
             isBodyShown: false,
             isTogglingBody: false,
+            insertedUrl: '',
             checkedValues: []
         }
     },
+    computed: {
+        checkedArray() {
+            let array = [];
+            for (let value of this.checkedValues) {
+                const input = this.$refs.filterCheckbox.find(inp => inp.value.trim() === value.trim());
+                const sectionNameDatasetNode = input.closest('[data-section-name]');
+                if (!sectionNameDatasetNode)
+                    continue;
+
+                const name = sectionNameDatasetNode.dataset.sectionName.trim();
+                const li = this.closestSectionItem(input);
+                const commentSpan = li.querySelector('.filter__section-item-comment');
+                const urlNode = li.querySelector('.filter__section-item-url');
+
+                const description = commentSpan ? commentSpan.textContent : null;
+                const url = urlNode ? urlNode.textContent : null;
+
+                const obj = { value, input, description, url };
+                const inArr = array.find(o => o.name === name);
+                if (inArr)
+                    inArr.values.push(obj);
+                else {
+                    array.push({ name, values: [obj] });
+                }
+            }
+            return array;
+        }
+    },
     methods: {
+        isAnyAttachmentAllowed(section) {
+            return section.allowComment
+                || section.allowUrl;
+        },
         closestSectionItem(relative) {
             return relative.closest('.filter__section-item');
         },
@@ -89,7 +133,7 @@ export default {
                 this.hideBody();
         },
         async onBodyTransEnd() {
-            if(!this.$refs.filterBody)
+            if (!this.$refs.filterBody)
                 return;
 
             await onTransitionEnd(this.$refs.filterBody);
@@ -144,77 +188,83 @@ export default {
         onCommentBlur(event) {
             event.target.removeAttribute('contenteditable');
         },
-        onCommentInput(event, section) {
-            this.toggleBody(true);
-
-            const checkbox = this.$refs.filterCheckbox
-                .find(node => this.closestSectionItem(node) === this.closestSectionItem(event.target));
-            if (checkbox && checkbox.checked) {
-                let obj = null;
-
-                for (let o of this.checkedValues) {
-                    obj = o.values.find(subO => subO.value === checkbox.value);
-                    if (obj)
-                        break;
-                }
-                const value = getTextContent(event.target);
-                if (obj)
-                    obj.description = value;
-            }
-        },
         refresh() {
-            this.checkedValues.forEach(section => {
-                section.values.forEach(obj => {
-                    obj.input.checked = false;
-                    obj.input.dispatchEvent(new Event('checked'));
-                });
+            this.checkedValues = [];
+            this.$refs.filterCheckbox.forEach(inp => inp.checked = false);
+            this.$refs.comment.forEach(span => span.textContent = '');
+            this.$refs.attachedUrl.forEach(link => {
+                link.textContent = '';
+                link.setAttribute('href', '#')
             });
+            this.updateAttachments();
         },
-        setChecked(value, comment = null) {
-            const checkbox = this.$refs.filterCheckbox.find(obj => obj.value === value);
-            if (!checkbox)
+        async setChecked(title, attachments = {}) {
+            await delay(0);
+
+            const input = this.$refs.filterCheckbox.find(inp => inp.value.trim() === title.trim());
+            if (!input)
                 return;
 
-            checkbox.checked = true;
-            checkbox.dispatchEvent(new Event('change'));
-            if (comment) {
-                const commentSpan = this.$refs.comment
-                    .find(node => this.closestSectionItem(node) === this.closestSectionItem(checkbox));
-                if (commentSpan) {
-                    commentSpan.textContent = comment;
-                    commentSpan.dispatchEvent(new Event('input'));
+            input.checked = true;
+            const li = this.closestSectionItem(input);
+            if (attachments) {
+                const commentNode = li.querySelector('.filter__section-item-comment');
+                const urlNode = li.querySelector('.filter__section-item-url');
+
+                if (commentNode && attachments.comment) {
+                    commentNode.textContent = attachments.comment;
                 }
+                if (urlNode && attachments.url) {
+                    urlNode.textContent = attachments.url;
+                    urlNode.setAttribute('href', attachments.url);
+                }
+
+                this.updateAttachments();
             }
+            input.dispatchEvent(new Event('change'));
         },
-        addToChecked(event, section, value) {
-            let obj = this.checkedValues.find(o => o.title === section.title);
-            if (!obj) {
-                obj = {
-                    title: section.title,
-                    name: section.name,
-                    values: []
-                };
-                this.checkedValues.push(obj);
-            }
+        updateAttachments() {
+            this.toggleBody(true);
 
-            if (event.target.checked) {
-                const data = { value, input: event.target };
-                if (section.allowComment) {
-                    const span = this.$refs.comment
-                        .find(node => {
-                            return this.closestSectionItem(node) === this.closestSectionItem(event.target);
-                        });
-                    if (span)
-                        data.description = getTextContent(span);
+            // обновит checkedArray
+            this.checkedValues = this.checkedValues.map(v => v);
+        },
+        attachUrl(event) {
+            const self = this;
+
+            const urlNode = this.closestSectionItem(event.target)
+                .querySelector('.filter__section-item-url');
+            if (!urlNode)
+                return;
+            const currentUrl = urlNode.textContent.trim();
+            if (!urlNode)
+                return;
+
+            const modalsStore = useModalsStore();
+            const textInputComp = h(TextInput, { name: 'test', inputId: 'test', placeholder: 'url', defaultValue: currentUrl });
+            modalsStore.addModalWindow({
+                title: 'Прикрепить URL к навыку',
+                body: [textInputComp],
+                modalClassNames: 'modal-window--with-input',
+                confirm: {
+                    title: 'Прикрепить',
+                    callback(modalWindowCtx) {
+                        const url = modalWindowCtx.textInputValue;
+                        urlNode.textContent = url;
+                        urlNode.setAttribute('href', url);
+                        self.updateAttachments();
+                    }
+                },
+                decline: {
+                    title: 'Очистить',
+                    callback() {
+                        urlNode.textContent = '';
+                        urlNode.setAttribute('href', '');
+                        self.updateAttachments();
+                    }
                 }
-
-                obj.values.push(data);
-            } else {
-                const index = obj.values.findIndex(o => o.value === value);
-                if (index >= 0)
-                    obj.values.splice(index, 1);
-            }
-        }
+            });
+        },
     },
     watch: {
         async body() {
@@ -223,10 +273,10 @@ export default {
                 this.showBody(true);
             }
         },
-        checkedValues: {
+        checkedArray: {
             deep: true,
             handler() {
-                this.$emit('update:modelValue', this.checkedValues);
+                this.$emit('update:modelValue', this.checkedArray);
             }
         }
     }

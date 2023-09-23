@@ -94,7 +94,8 @@ export default {
             await nextTick();
 
             const newAnchorLinks = qsAll('a[href^="#"]')
-                .filter(link => !this.modifiedAnchorLinks.includes(link));
+                .filter(link => !this.modifiedAnchorLinks.includes(link)
+                    && link.getAttribute('href').length > 1);
             newAnchorLinks.forEach(link => {
                 link.addEventListener('click', this.onAnchorLinkClick);
             });

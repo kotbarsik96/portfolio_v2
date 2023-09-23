@@ -80,87 +80,118 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-exit:before {
-    content: "\e91b";
-}
-.icon-turn-back:before {
-    content: "\e91a";
-}
-.icon-pause:before {
-    content: "\e919";
-}
-.icon-expand:before {
-    content: "\e918";
-}
-.icon-image:before {
-    content: "\e916";
-}
-.icon-video:before {
-    content: "\e917";
-}
-.icon-kw:before {
-    content: "\e914";
-}
-.icon-github:before {
-    content: "\e915";
-}
-.icon-chevron-right:before {
-    content: "\e913";
-}
-.icon-mobile:before {
+.icon-attachment:before {
     content: "\e900";
 }
-.icon-desktop:before {
+
+.icon-mobile:before {
     content: "\e901";
 }
-.icon-question-mark:before {
+
+.icon-desktop:before {
     content: "\e902";
 }
-.icon-activity:before {
+
+.icon-question-mark:before {
     content: "\e903";
 }
-.icon-add-image:before {
+
+.icon-activity:before {
     content: "\e904";
 }
-.icon-add-video:before {
+
+.icon-add-image:before {
     content: "\e905";
 }
-.icon-cancel:before {
+
+.icon-add-video:before {
     content: "\e906";
 }
-.icon-circle-minus:before {
+
+.icon-cancel:before {
     content: "\e907";
 }
-.icon-filter:before {
+
+.icon-circle-minus:before {
     content: "\e908";
 }
-.icon-moon:before {
+
+.icon-filter:before {
     content: "\e909";
 }
-.icon-pencil:before {
+
+.icon-moon:before {
     content: "\e90a";
 }
-.icon-person:before {
+
+.icon-pencil:before {
     content: "\e90b";
 }
-.icon-play-video:before {
+
+.icon-person:before {
     content: "\e90c";
 }
-.icon-portfolio:before {
+
+.icon-play-video:before {
     content: "\e90d";
 }
-.icon-programming:before {
+
+.icon-portfolio:before {
     content: "\e90e";
 }
-.icon-search:before {
+
+.icon-programming:before {
     content: "\e90f";
 }
-.icon-sun:before {
+
+.icon-search:before {
     content: "\e910";
 }
-.icon-telegram:before {
+
+.icon-sun:before {
     content: "\e911";
 }
-.icon-web-development:before {
+
+.icon-telegram:before {
     content: "\e912";
+}
+
+.icon-web-development:before {
+    content: "\e913";
+}
+
+.icon-chevron-right:before {
+    content: "\e914";
+}
+
+.icon-kw:before {
+    content: "\e915";
+}
+
+.icon-github:before {
+    content: "\e916";
+}
+
+.icon-image:before {
+    content: "\e917";
+}
+
+.icon-video:before {
+    content: "\e918";
+}
+
+.icon-expand:before {
+    content: "\e919";
+}
+
+.icon-pause:before {
+    content: "\e91a";
+}
+
+.icon-turn-back:before {
+    content: "\e91b";
+}
+
+.icon-exit:before {
+    content: "\e91c";
 }

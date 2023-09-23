@@ -6,7 +6,7 @@
             </h3>
             <div class="skills">
                 <div class="skills__search">
-                    <MySearch inputId="skills-search" name="search"></MySearch>
+                    <MySearch inputId="skills-search" placeholder="Поиск" name="search"></MySearch>
                 </div>
                 <div class="skills__list-container">
                     <ul v-if="items.length > 0" class="skills__list">

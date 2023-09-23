@@ -25,6 +25,9 @@ class WorksController extends Controller
 
             if ($data->description)
                 $obj->description = $data->description;
+            if ($data->url)
+                $obj->url = $data->url;
+
             $array[$key] = $obj;
         }
         return $array;
@@ -149,8 +152,12 @@ class WorksController extends Controller
                 'work_id' => $params['workId'],
                 $params['addingColumnName'] => $obj['id']
             ];
+            
             if (array_key_exists('description', $obj))
                 $fields['description'] = $obj['description'];
+
+            if (array_key_exists('url', $obj))
+                $fields['url'] = $obj['url'];
 
             $existing = $params['modelToCreate']::where('work_id', $params['workId'])
                 ->where($params['addingColumnName'], $obj['id'])

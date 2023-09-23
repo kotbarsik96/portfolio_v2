@@ -13,6 +13,7 @@ class WorksSkills extends Model
     protected $fillable = [
         'work_id',
         'skill_id',
-        'description'
+        'description',
+        'url'
     ];
 }

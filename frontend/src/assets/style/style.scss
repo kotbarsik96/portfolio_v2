@@ -68,7 +68,7 @@ label {
     }
 
     @media (max-width: 499px) {
-        font-size: 40px;
+        font-size: 30px;
     }
 }
 
@@ -1081,6 +1081,7 @@ label {
 
         &:disabled {
             cursor: not-allowed;
+
             &::before {
                 color: var(--dark_2);
             }
@@ -1206,10 +1207,17 @@ label {
         margin-bottom: 15px;
     }
 
+    &__section-label {
+        order: 1;
+    }
+
     &__section-item {
         position: relative;
-        padding-right: 30px;
         margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
 
         &:last-child {
             margin-bottom: 0;
@@ -1220,28 +1228,46 @@ label {
         }
     }
 
-    &__section-item-comment {
-        text-decoration: underline;
-        text-underline-offset: 6px;
+    &__section-item-buttons {
+        order: 2;
+        display: flex;
+        align-items: center;
+
+        button {
+            margin-right: 15px;
+
+            &:last-child {
+                margin-right: 0;
+            }
+
+            &::before {
+                color: var(--text_color_modals);
+                font-size: 21px;
+            }
+        }
     }
 
-    &__section-item-comment {
-        display: inline-block;
+    &__section-item-attachments {
+        order: 3;
+        flex: 0 0 100%;
+    }
+
+    &__section-item-attachment {
+        display: block;
         margin: 5px 0;
         font-size: 19px;
         padding-left: 30px;
         line-height: 1.35;
     }
 
-    &__section-item-write-button {
-        position: absolute;
-        right: 0;
-        top: 0;
+    &__section-item-comment {
+        text-decoration: underline;
+        text-underline-offset: 6px;
+    }
 
-        &::before {
-            color: var(--text_color_modals);
-            font-size: 21px;
-        }
+    &__section-item-url {
+        color: var(--action_color);
+        word-break: break-all;
     }
 }
 
@@ -1540,6 +1566,7 @@ label {
 
         &:disabled {
             cursor: not-allowed;
+
             &::before {
                 color: var(--dark_2);
             }
@@ -1721,7 +1748,13 @@ label {
     background-color: var(--main_color);
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
     padding: 15px 40px;
+    margin: 0 15px;
     color: var(--text_color_modals);
+
+    &--with-input {
+        max-width: 100%;
+        width: 1000px;
+    }
 
     &__close {
         position: absolute;

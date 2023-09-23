@@ -120,6 +120,7 @@ export default {
             return arr.map(obj => {
                 if (obj.name === 'skills') {
                     obj.allowComment = true;
+                    obj.allowUrl = true;
                 }
                 return obj;
             });
@@ -142,7 +143,7 @@ export default {
             this.imageDesktopId = null;
             this.imageMobileId = null;
 
-            const refreshableRefs = ['titleInput', 'filter', 'tagSelect'];
+            const refreshableRefs = ['titleInput', 'urlInput', 'filter', 'tagSelect'];
             refreshableRefs.forEach(str => {
                 if (this.$refs[str] && typeof this.$refs[str].refresh === 'function')
                     this.$refs[str].refresh();
@@ -160,7 +161,10 @@ export default {
                         if (!obj)
                             return;
 
-                        this.$refs.filter.setChecked(obj.title, obj.description);
+                        this.$refs.filter.setChecked(obj.title, {
+                            comment: obj.description,
+                            url: obj.url
+                        });
                     });
                 }
             });
