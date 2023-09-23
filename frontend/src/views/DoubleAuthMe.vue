@@ -1,9 +1,6 @@
 <template>
     <div class="container">
         <section class="hello-form" ref="form" @keyup="(event) => event.key === 'Enter' ? login() : false">
-            <Transition name="fade-in">
-                <MyLoading v-if="isLoading" isAbsolute></MyLoading>
-            </Transition>
             <div class="input-item input-item--full">
                 <label for="me_letsgo" class="input-item__label">
                     Код подтверждения
@@ -32,16 +29,16 @@ export default {
     },
     data() {
         return {
-            isLoading: false
+            
         }
     },
     methods: {
         async login() {
-            this.isLoading = true;
+            const store = useMyStore();
+            store.isLoading = true;
             const data = Object.assign(getDataFromForms(this.$refs.form), this.authData);
 
             const res = await axios.post(`${import.meta.env.VITE_API_LINK}doubleauth`, data);
-            const store = useMyStore();
             if (!res.data.success) {
                 store.authData = null;
                 this.$router.push({ name: 'Home' });
@@ -53,7 +50,7 @@ export default {
 
             store.checkIfIsMe();
             store.authData = null;
-            this.isLoading = false;
+            store.isLoading = false;
         }
     },
     computed: {

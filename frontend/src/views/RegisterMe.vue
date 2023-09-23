@@ -1,12 +1,13 @@
 <template>
     <div class="container">
         <section class="hello-form" ref="form" @keyup="(event) => event.key === 'Enter' ? register() : false">
-            <MyLoading v-if="isLoading" isAbsolute></MyLoading>
             <InputItem class="input-item--full" label="Логин" id="name" name="name" placeholder="Логин" value="illusiveman">
             </InputItem>
-            <InputItem class="input-item--full" label="Email" id="email" name="email" placeholder="Email" value="kotbarsik96@gmail.com">
+            <InputItem class="input-item--full" label="Email" id="email" name="email" placeholder="Email"
+                value="kotbarsik96@gmail.com">
             </InputItem>
-            <InputItem class="input-item--full" label="Телеграм" id="telegram" name="telegram" placeholder="Телеграм" value="t.me/kotbarsik96">
+            <InputItem class="input-item--full" label="Телеграм" id="telegram" name="telegram" placeholder="Телеграм"
+                value="t.me/kotbarsik96">
             </InputItem>
             <InputItem class="input-item--full" label="Пароль" id="pass" type="password" placeholder="Пароль"
                 name="password" value="Wh19t30213035;">
@@ -31,7 +32,8 @@ export default {
     name: 'RegisterMe',
     methods: {
         async register() {
-            this.isLoading = true;
+            const store = useMyStore();
+            store.isLoading = true;
             const data = getDataFromForms(this.$refs.form);
             const res = await axios.post(`${import.meta.env.VITE_API_LINK}register`, data);
             console.log(res);
@@ -39,13 +41,8 @@ export default {
             if (res.data.user) {
                 this.$router.push({ name: 'ShowQr' });
             }
-            this.isLoading = false;
+            store.isLoading = false;
         },
-    },
-    data() {
-        return {
-            isLoading: false,
-        }
     },
     computed: {
         ...mapState(useMyStore, ['isMe'])

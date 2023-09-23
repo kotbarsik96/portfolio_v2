@@ -1,9 +1,6 @@
 <template>
     <div class="container">
         <section class="hello-form" ref="form" @keyup="(event) => event.key === 'Enter' ? login() : false">
-            <Transition name="fade-in">
-                <MyLoading v-if="isLoading" isAbsolute></MyLoading>
-            </Transition>
             <InputItem class="input-item--full" label="Логин" id="name" name="name" placeholder="Логин">
             </InputItem>
             <InputItem class="input-item--full" label="Пароль" id="password" type="password" placeholder="Пароль"
@@ -27,12 +24,13 @@ export default {
     name: 'AuthMe',
     data() {
         return {
-            isLoading: false
+            
         }
     },
     methods: {
         async login() {
-            this.isLoading = true;
+            const store = useMyStore();
+            store.isLoading = true;
 
             if (!Cookies.get("XSRF-TOKEN")) {
                 await axios.get(`${import.meta.env.VITE_SANCTUM_CSRF_COOKIE}`);
@@ -50,7 +48,7 @@ export default {
                 console.error(e);
             }
 
-            this.isLoading = false;
+            store.isLoading = false;
         }
     },
     computed: {
