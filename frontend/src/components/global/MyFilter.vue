@@ -11,12 +11,20 @@
                     {{ section.title }}
                 </h5>
                 <ul class="filter__section-items">
-                    <li v-for="value in section.values" :key="value" class="filter__section-item">
-                        <label class="filter__section-label checkbox-label">
-                            <input type="checkbox" ref="filterCheckbox" :name="section.name" :value="value"
+                    <li v-for="(value, index) in section.values" :key="value" class="filter__section-item">
+                        <label v-if="getInputType(section) === 'checkbox'" class="filter__section-label checkbox-label">
+                            <input type="checkbox" ref="filterInputButton" :name="section.name" :value="value"
                                 v-model="checkedValues">
                             <span class="checkbox-label__box"></span>
                             <span class="checkbox-label__text">
+                                {{ value }}
+                            </span>
+                        </label>
+                        <label v-if="getInputType(section) === 'radio'" class="filter__section-label radio-label">
+                            <input type="radio" ref="filterInputButton" :name="section.name" :value="value"
+                                v-model="radioModels[section.name]">
+                            <span class="radio-label__circle"></span>
+                            <span class="radio-label__text">
                                 {{ value }}
                             </span>
                         </label>
@@ -30,8 +38,8 @@
                             <span v-if="section.allowComment"
                                 class="filter__section-item-attachment filter__section-item-comment editable" ref="comment"
                                 @blur="onCommentBlur" @input="updateAttachments"></span>
-                            <a v-if="section.allowUrl" class="filter__section-item-attachment filter__section-item-url" ref="attachedUrl"
-                                href="#"></a>
+                            <a v-if="section.allowUrl" class="filter__section-item-attachment filter__section-item-url"
+                                ref="attachedUrl" href="#"></a>
                         </div>
                     </li>
                 </ul>
@@ -41,7 +49,7 @@
 </template>
 
 <script>
-import { getHeight, onTransitionEnd, setEditable, delay } from '@/assets/scripts/scripts.js';
+import { getHeight, onTransitionEnd, setEditable, delay, qsAll } from '@/assets/scripts/scripts.js';
 import { nextTick, h } from 'vue';
 import { useModalsStore } from '@/stores/modals.js';
 import TextInput from './TextInput.vue';
@@ -53,7 +61,12 @@ export default {
         modelValue: Array,
         body: {
             /* body: [
-                { title: 'Тип', values: ['Вёрстка по макету', 'Интеграция с backend'], allowComment: true }
+                { 
+                    title: 'Тип', 
+                    isRadio: true, 
+                    values: ['Вёрстка по макету', 'Интеграция с backend'], 
+                    allowComment: true 
+                }
             ]*/
             type: Array,
             required: true
@@ -69,6 +82,7 @@ export default {
         const media = window.matchMedia('(max-width: 1279px)');
         media.addEventListener("change", onMediaChange);
         onMediaChange();
+        setFirstRadioChecked();
 
         function onMediaChange() {
             if (media.matches) {
@@ -77,26 +91,42 @@ export default {
                 self.toggleBody(true);
             }
         }
+        function setFirstRadioChecked() {
+            const radio = self.body.filter(obj => obj.isRadio);
+            radio.forEach(async obj => {
+                const value = obj.values[0];
+                const input = self.$refs.filterInputButton.find(inp => inp.value === value);
+                if (!input)
+                    return;
+
+                await delay(0);
+                input.checked = true;
+                input.dispatchEvent(new Event('change'));
+            });
+        }
     },
     data() {
         return {
             isBodyShown: false,
             isTogglingBody: false,
             insertedUrl: '',
-            checkedValues: []
+            checkedValues: [],
+            radioModels: {}
         }
     },
     computed: {
         checkedArray() {
-            let array = [];
-            for (let value of this.checkedValues) {
-                const input = this.$refs.filterCheckbox.find(inp => inp.value.trim() === value.trim());
+            function handleInput(input) {
+                if (!input)
+                    return;
+
                 const sectionNameDatasetNode = input.closest('[data-section-name]');
                 if (!sectionNameDatasetNode)
-                    continue;
+                    return;
 
+                const value = input.value;
                 const name = sectionNameDatasetNode.dataset.sectionName.trim();
-                const li = this.closestSectionItem(input);
+                const li = self.closestSectionItem(input);
                 const commentSpan = li.querySelector('.filter__section-item-comment');
                 const urlNode = li.querySelector('.filter__section-item-url');
 
@@ -111,10 +141,28 @@ export default {
                     array.push({ name, values: [obj] });
                 }
             }
+
+            const self = this;
+            let array = [];
+            for (let value of this.checkedValues) {
+                const input = this.$refs.filterInputButton.find(inp => inp.value.trim() === value.trim());
+                handleInput(input);
+            }
+            for (let key in this.radioModels) {
+                const value = this.radioModels[key];
+                const input = this.$refs.filterInputButton.find(inp => inp.value.trim() === value.trim());
+                handleInput(input);
+            }
             return array;
         }
     },
     methods: {
+        getInputType(section) {
+            if (section.isRadio)
+                return 'radio';
+
+            return 'checkbox';
+        },
         isAnyAttachmentAllowed(section) {
             return section.allowComment
                 || section.allowUrl;
@@ -148,6 +196,9 @@ export default {
             this.isBodyShown = true;
 
             const fbody = this.$refs.filterBody;
+            if (!fbody)
+                return;
+
             const height = getHeight(fbody);
             fbody.style.removeProperty('padding');
             fbody.style.removeProperty('margin');
@@ -172,6 +223,9 @@ export default {
             this.isBodyShown = false;
 
             const fbody = this.$refs.filterBody;
+            if (!fbody)
+                return;
+
             fbody.style.cssText = `
                 transition: all .3s;
                 padding: 0;
@@ -190,7 +244,7 @@ export default {
         },
         refresh() {
             this.checkedValues = [];
-            this.$refs.filterCheckbox.forEach(inp => inp.checked = false);
+            this.$refs.filterInputButton.forEach(inp => inp.checked = false);
             this.$refs.comment.forEach(span => span.textContent = '');
             this.$refs.attachedUrl.forEach(link => {
                 link.textContent = '';
@@ -201,7 +255,7 @@ export default {
         async setChecked(title, attachments = {}) {
             await delay(0);
 
-            const input = this.$refs.filterCheckbox.find(inp => inp.value.trim() === title.trim());
+            const input = this.$refs.filterInputButton.find(inp => inp.value.trim() === title.trim());
             if (!input)
                 return;
 

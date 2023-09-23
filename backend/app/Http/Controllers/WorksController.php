@@ -152,7 +152,7 @@ class WorksController extends Controller
                 'work_id' => $params['workId'],
                 $params['addingColumnName'] => $obj['id']
             ];
-            
+
             if (array_key_exists('description', $obj))
                 $fields['description'] = $obj['description'];
 

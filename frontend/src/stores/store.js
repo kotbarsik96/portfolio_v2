@@ -37,7 +37,7 @@ export const useMyStore = defineStore("myStore", {
                 this.logout();
                 return false;
             } catch (err) {
-                
+
             }
         },
         async logout() {
@@ -68,6 +68,7 @@ export const useMyStore = defineStore("myStore", {
                 {
                     name: 'types',
                     title: 'Типы',
+                    isRadio: true,
                     values: state.taxonomies.types
                         ? state.taxonomies.types.map(obj => obj.title)
                         : []

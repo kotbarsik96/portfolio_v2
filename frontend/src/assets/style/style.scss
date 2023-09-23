@@ -335,6 +335,69 @@ label {
 
 /* <CHECKBOX-LABEL>===============================================================================*/
 
+/* <RADIO-LABEL>================================================================================= */
+.radio-label {
+    --trans_dur: 0.2s;
+
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+
+    input {
+        display: none;
+    }
+
+    &__circle {
+        margin-right: 10px;
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 1px solid var(--text_color_modals);
+        transition-property: border-color;
+        transition-duration: var(--trans_dur);
+        
+
+        &::before {
+            content: "";
+            background-color: var(--action_color);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition-property: opacity;
+            transition-duration: var(--trans_dur);
+        }
+    }
+
+    input:checked+&__circle {
+        border-color: var(--action_color);
+
+        &::before {
+            opacity: 1;
+        }
+    }
+
+    input:checked+*+&__text {
+        color: var(--action_color);
+    }
+
+    &__text {
+        font-size: 19px;
+        transition-property: color;
+        transition-duration: var(--trans_dur);
+    }
+}
+
+/* <RADIO-LABEL>================================================================================= */
+
 /* <LIST>======================================================================================== */
 .list {
     &__item {
