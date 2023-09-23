@@ -208,7 +208,7 @@ export default {
             store.isLoading = true;
             try {
                 const res = await axios.delete(url);
-                if(!res.data.error) {
+                if (!res.data.error) {
                     this.$router.push({ name: 'AddWork' });
                 }
             } catch (err) { }
