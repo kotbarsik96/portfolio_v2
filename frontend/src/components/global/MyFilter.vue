@@ -185,6 +185,9 @@ export default {
                 return;
 
             await onTransitionEnd(this.$refs.filterBody);
+            if (!this.$refs.filterBody)
+                return;
+            
             this.$refs.filterBody.style.removeProperty('transition');
             this.isTogglingBody = false;
         },

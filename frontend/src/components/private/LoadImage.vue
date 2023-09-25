@@ -6,8 +6,8 @@
                 <button v-if="imageSrc" class="load-media__cancel icon-cancel" @click.stop="removeImage"></button>
             </Transition>
         </div>
-        <div class="load-media__container" :class="{ 'load-media__container--loaded': imageSrc }"
-            ref="loadedImageContainer" @click.self="openExplorer">
+        <div class="load-media__container" :class="{ 'load-media__container--loaded': imageSrc }" ref="loadedImageContainer"
+            @click.self="openExplorer">
             <Transition name="scale-up" mode="out-in">
                 <img v-if="imageSrc" :src="imageSrc">
                 <span v-else class="icon-add-image" @click.self="openExplorer"></span>
@@ -30,7 +30,7 @@ export default {
         },
         placeholderData: Object,
         modelValue: [String, Number],
-        /* указывает подпапку, в которую нужно загрузить видео (по умолчанию загружается в images/, если указать, например, subfolderName: 'skill', будет images/skill) */
+        /* указывает подпапку, в которую нужно загрузить изображение (по умолчанию загружается в images/, если указать, например, subfolderName: 'skill', будет images/skill) */
         subfolderName: String
     },
     emits: ['update:modelValue', 'update:isUploading'],
@@ -81,21 +81,21 @@ export default {
                 data.append('subfolder', this.subfolderName);
 
             try {
-                // если к скиллу уже прикреплено изображение, обновить его
+                // если уже прикреплено изображение, обновить его
                 if (this.imageId) {
                     const url = `${import.meta.env.VITE_API_LINK}image/${this.imageId}`;
                     const res = await axios.post(url, data);
                     if (res.data.id)
                         this.imageId = res.data.id;
                 }
-                // если у скилла еще нет изображения, добавить
+                // если еще нет изображения, добавить
                 else {
                     const res = await axios.post(`${import.meta.env.VITE_API_LINK}image`, data);
                     if (res.data && res.data.id)
                         this.imageId = res.data.id;
                 }
             } catch (err) { }
-
+            
             this.isUploading = false;
         },
         async removeImage() {

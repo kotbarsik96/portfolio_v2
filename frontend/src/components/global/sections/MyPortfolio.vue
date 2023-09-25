@@ -8,7 +8,8 @@
                 <div class="portfolio__list-container">
                     <Transition name="fade-in" mode="out-in">
                         <MyLoading v-if="!works"></MyLoading>
-                        <TransitionGroup v-else-if="works.length > 0" tag="ul" class="portfolio__list" name="portfolio-item">
+                        <TransitionGroup v-else-if="works.length > 0" tag="ul" class="portfolio__list"
+                            name="portfolio-item">
                             <PortfolioItem v-for="work in works" :key="work.id" :data="work"></PortfolioItem>
                         </TransitionGroup>
                         <div v-else class="empty">
@@ -24,7 +25,7 @@
                         </div>
                     </Transition>
                     <Transition name="fade-in">
-                        <button v-if="works && works.length > 0" class="button list-more" type="button">
+                        <button v-if="showMoreButton" class="button list-more" type="button" @click="loadMoreWorks">
                             Показать еще
                         </button>
                     </Transition>
@@ -44,6 +45,8 @@ import axios from 'axios';
 import { useMyStore } from '@/stores/store';
 import { mapState } from 'pinia';
 
+const loadPerQuery = 2;
+const firstLoadedCount = 4;
 
 export default {
     name: 'MyPortfolio',
@@ -53,36 +56,94 @@ export default {
     },
     created() {
         this.loadWorks();
+        this.loadWorksCount();
     },
     data() {
         return {
             works: null,
             emptyIcon,
-            checkedFilters: []
+            worksCount: 0,
+            checkedFilters: [],
+            loadPerQuery,
+            loadedWorksCount: firstLoadedCount,
+            offset: firstLoadedCount,
+            isLoadingWorks: false,
         }
     },
     computed: {
         ...mapState(useMyStore, ['worksFilterBody']),
+        showMoreButton() {
+            return this.works
+                && this.works.length > 0
+                && this.worksCount > this.works.length
+                && !this.isLoadingWorks;
+        },
     },
     methods: {
-        async loadWorks() {
+        async loadWorksCount() {
             try {
-                const url = `${import.meta.env.VITE_API_LINK}works/filter`;
-                const filterQueries = {};
-                this.checkedFilters.forEach(obj => {
-                    filterQueries[obj.name] = obj.values.map(o => o.value);
-                });
-                const res = await axios(url, {
-                    params: filterQueries
-                });
-                this.works = res.data;
+                const res = await axios(`${import.meta.env.VITE_API_LINK}works/count`);
+                this.worksCount = parseInt(res.data);
             } catch (err) { }
+        },
+        getFilters() {
+            const data = {};
+            this.checkedFilters.forEach(obj => {
+                data[obj.name] = obj.values.map(o => o.value);
+            });
+            return data;
+        },
+        // первичная загрузка работ и загрузка работ после применения фильтра. Увеличивает loadedWorksCount  только при первой загрузке
+        async loadWorks() {
+            this.isLoadingWorks = true;
+
+            const url = `${import.meta.env.VITE_API_LINK}works/filter`;
+            const params = Object.assign(this.getFilters(), {
+                limit: this.loadedWorksCount
+            });
+
+            try {
+                const res = await axios(url, { params });
+                if (Array.isArray(res.data)) {
+                    this.works = res.data;
+                } else {
+                    this.works = [];
+                }
+            } catch (err) { }
+
+            this.isLoadingWorks = false;
+            if (this.loadedWorksCount < this.works.length)
+                this.loadedWorksCount = this.works.length;
+        },
+        // загрузка работ после нажатия кнопки "Показать еще". Сдвигает offset и увеличивает loadedWorksCount
+        async loadMoreWorks() {
+            this.isLoadingWorks = true;
+
+            let newWorks = [];
+            const url = `${import.meta.env.VITE_API_LINK}works/filter`;
+            const params = Object.assign(this.getFilters(), {
+                limit: this.loadPerQuery,
+                offset: this.offset
+            });
+
+            try {
+                const res = await axios(url, { params });
+                if (Array.isArray(res.data)) {
+                    newWorks = res.data;
+                    this.works = this.works.concat(newWorks);
+                }
+            } catch (err) { }
+
+            this.offset += newWorks.length;
+            this.loadedWorksCount += newWorks.length;
+            this.isLoadingWorks = false;
         }
     },
     watch: {
         checkedFilters: {
             deep: true,
             handler() {
+                this.offset = 0;
                 this.loadWorks();
             }
         }

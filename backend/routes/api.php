@@ -28,6 +28,7 @@ Route::post('/logout', [AuthController::class, 'logout']);
 Route::get('/works', [WorksController::class, 'all']);
 Route::get('/works/filter', [WorksController::class, 'allFiltered']);
 Route::get('/work/{id}', [WorksController::class, 'single']);
+Route::get('/works/count', [WorksController::class, 'count']);
 
 Route::get('/skills', [SkillsController::class, 'all']);
 Route::get('/skill/{id}', [SkillsController::class, 'single']);

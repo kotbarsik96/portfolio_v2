@@ -71,6 +71,11 @@ class WorksController extends Controller
         return $obj->$column;
     }
 
+    public function count()
+    {
+        return Work::count();
+    }
+
     public function all(Request $request)
     {
         $works = Work::all();
@@ -82,7 +87,11 @@ class WorksController extends Controller
 
     public function allFiltered(WorkFilter $request)
     {
-        $works = Work::filter($request)->get();
+        $queries = $request->queries();
+        $limit = array_key_exists('limit', $queries) ? $queries['limit'] : 0;
+        $offset = array_key_exists('offset', $queries) ? $queries['offset'] : 0;
+        
+        $works = Work::filter($request)->getOffset($limit, $offset);
         foreach ($works as $key => $work) {
             $works[$key] = $this->getWorkData($work);
         }

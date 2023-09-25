@@ -227,7 +227,9 @@ export default {
                 if (res.data.id) {
                     this.$router.push({ name: 'EditWork', params: { id: res.data.id } });
                 }
-            } catch (err) { }
+            } catch (err) { 
+                console.log(err);
+            }
 
             store.isLoading = false;
             this.afterAnyAction();
