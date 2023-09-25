@@ -1,9 +1,9 @@
-FROM node:lts-alpine
+FROM node:18.13.0-alpine
 
 WORKDIR /var/www/frontend
 
-COPY package*.json ./
+COPY ./frontend/package*.json ./
 
 RUN npm install
 
-RUN npm run build
+CMD ["npm", "run", "dev"]
