@@ -143,6 +143,29 @@ label {
     transform: scale(1);
 }
 
+// for portfolio items
+.portfolio-item-enter-active,
+.portfolio-item-leave-active {
+    transition: all .3s;
+    overflow: hidden;
+}
+
+.portfolio-item-enter-from,
+.portfolio-item-leave-to {
+    transform: scale(0);
+    max-height: 0;
+    max-width: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.portfolio-item-enter-to,
+.portfolio-item-leave-from {
+    transform: scale(1);
+    max-height: 500px;
+    max-width: 500px;
+}
+
 /* <ANIMATIONS, TRANSITIONS>===================================================================== */
 
 /* <UI>========================================================================================== */
@@ -360,7 +383,7 @@ label {
         border: 1px solid var(--text_color_modals);
         transition-property: border-color;
         transition-duration: var(--trans_dur);
-        
+
 
         &::before {
             content: "";
@@ -914,8 +937,8 @@ label {
 
     &__list {
         display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
+        justify-content: center;
+        align-items: center;
         flex-wrap: wrap;
         width: 100%;
     }
@@ -960,9 +983,11 @@ label {
     z-index: 10;
     flex: 0 0 414px;
     margin-bottom: 40px;
+    margin-right: 20px;
 
     &:nth-child(2n) {
         z-index: 5;
+        margin-right: 0;
     }
 
     &.__shown-skills &__image {

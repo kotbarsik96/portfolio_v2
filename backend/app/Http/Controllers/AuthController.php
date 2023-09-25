@@ -101,6 +101,7 @@ class AuthController extends Controller
         $google2fa = new Google2FA();
         $isValid = $google2fa->verifyKey($user->google2fa_secret, $request['secret']);
 
+
         if (!$isValid)
             return response(['success' => false]);
 

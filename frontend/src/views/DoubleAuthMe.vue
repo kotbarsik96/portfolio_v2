@@ -41,6 +41,7 @@ export default {
             const res = await axios.post(`${import.meta.env.VITE_API_LINK}doubleauth`, data);
             if (!res.data.success) {
                 store.authData = null;
+                store.isLoading = false;
                 this.$router.push({ name: 'Home' });
                 return;
             }

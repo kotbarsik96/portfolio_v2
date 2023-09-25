@@ -8,9 +8,9 @@
                 <div class="portfolio__list-container">
                     <Transition name="fade-in" mode="out-in">
                         <MyLoading v-if="!works"></MyLoading>
-                        <ul v-else-if="works.length > 0" class="portfolio__list">
+                        <TransitionGroup v-else-if="works.length > 0" tag="ul" class="portfolio__list" name="portfolio-item">
                             <PortfolioItem v-for="work in works" :key="work.id" :data="work"></PortfolioItem>
-                        </ul>
+                        </TransitionGroup>
                         <div v-else class="empty">
                             <img :src="emptyIcon" alt="" class="empty__icon">
                             <div class="empty__text">

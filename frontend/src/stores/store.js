@@ -35,7 +35,6 @@ export const useMyStore = defineStore("myStore", {
 
                 this.isMe = false;
             } catch (err) {
-                console.log(err);
             }
 
             if (!this.isMe) {
@@ -44,12 +43,11 @@ export const useMyStore = defineStore("myStore", {
             }
         },
         async logout() {
-            this.isMe = false;
-
             try {
                 await axios.post(`${import.meta.env.VITE_API_LINK}logout`);
             } catch (err) { }
 
+            this.isMe = false;
             Cookie.remove("user");
             Cookie.remove("user_id");
         },
