@@ -68,6 +68,11 @@ export default {
         this.theme = store.theme;
         store.$subscribe((m, state) => this.theme = state.theme);
 
+        if (this.data.image_desktop)
+            this.changeImage('desktop');
+        else if (this.data.image_mobile)
+            this.changeImage('mobile');
+
         this.sliceSkillsPages();
         window.addEventListener("resize", () => {
             // таким образом метод будет вызван спустя некоторое время после того, как пользователь изменит размер экрана, иначе он будет вызываться очень много раз
@@ -79,7 +84,7 @@ export default {
     data() {
         return {
             theme: '',
-            imageType: 'desktop',
+            imageType: '',
             isShownSkills: false,
             skillsPageNumber: 1,
             slicedSkillsPages: [],
