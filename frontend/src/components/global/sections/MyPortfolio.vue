@@ -18,7 +18,7 @@
                                     К сожалению, ничего не найдено
                                 </p>
                                 <p>
-                                    Попробуйте выбрать другие фильтры
+                                    Возможно, стоит выбрать другие фильтры
                                 </p>
                             </div>
                         </div>
@@ -29,7 +29,8 @@
                         </button>
                     </Transition>
                 </div>
-                <MyFilter class="portfolio__filter modal" isHideable :body="worksFilterBody"></MyFilter>
+                <MyFilter class="portfolio__filter modal" isHideable :body="worksFilterBody" v-model="checkedFilters">
+                </MyFilter>
             </div>
         </div>
     </section>
@@ -56,7 +57,8 @@ export default {
     data() {
         return {
             works: null,
-            emptyIcon
+            emptyIcon,
+            checkedFilters: []
         }
     },
     computed: {
@@ -65,9 +67,24 @@ export default {
     methods: {
         async loadWorks() {
             try {
-                const res = await axios.get(`${import.meta.env.VITE_API_LINK}works`);
+                const url = `${import.meta.env.VITE_API_LINK}works/filter`;
+                const filterQueries = {};
+                this.checkedFilters.forEach(obj => {
+                    filterQueries[obj.name] = obj.values.map(o => o.value);
+                });
+                const res = await axios(url, {
+                    params: filterQueries
+                });
                 this.works = res.data;
             } catch (err) { }
+        }
+    },
+    watch: {
+        checkedFilters: {
+            deep: true,
+            handler() {
+                this.loadWorks();
+            }
         }
     }
 }

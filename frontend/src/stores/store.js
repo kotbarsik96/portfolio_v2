@@ -34,10 +34,13 @@ export const useMyStore = defineStore("myStore", {
                 }
 
                 this.isMe = false;
+            } catch (err) {
+                console.log(err);
+            }
+
+            if (!this.isMe) {
                 this.logout();
                 return false;
-            } catch (err) {
-
             }
         },
         async logout() {
@@ -68,7 +71,6 @@ export const useMyStore = defineStore("myStore", {
                 {
                     name: 'types',
                     title: 'Типы',
-                    isRadio: true,
                     values: state.taxonomies.types
                         ? state.taxonomies.types.map(obj => obj.title)
                         : []

@@ -1,8 +1,6 @@
 <?php
 
 use App\Http\Controllers\TaxonomiesController;
-use App\Models\User;
-use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WorksController;
@@ -28,6 +26,7 @@ Route::post('/doubleauth', [AuthController::class, 'validate2fa']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
 Route::get('/works', [WorksController::class, 'all']);
+Route::get('/works/filter', [WorksController::class, 'allFiltered']);
 Route::get('/work/{id}', [WorksController::class, 'single']);
 
 Route::get('/skills', [SkillsController::class, 'all']);
@@ -37,10 +36,10 @@ Route::get('/taxonomies/{title}', [TaxonomiesController::class, 'all']);
 
 Route::get('/alldata', [DataController::class, 'all']);
 
-// test if user is authorized
-Route::post('/check-auth', [AuthController::class, 'checkAuth']);
-
 Route::middleware('auth:sanctum')->group(function () {
+    // test if user is authorized
+    Route::post('/check-auth', [AuthController::class, 'checkAuth']);
+
     // works
     Route::post('/work', [WorksController::class, 'store']);
     Route::post('/work/{id}', [WorksController::class, 'update']);

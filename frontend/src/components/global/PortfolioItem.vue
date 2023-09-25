@@ -17,7 +17,7 @@
                 <div class="portfolio-item__skills-container">
                     <ol class="portfolio-item__skills-list" v-html="currentShownSkills" ref="skillsList"></ol>
                 </div>
-                <div v-if="slicedSkillsPages.length > 0" class="portfolio-item__skills-pagination">
+                <div v-if="slicedSkillsPages.length > 1" class="portfolio-item__skills-pagination">
                     <button class="portfolio-item__skills-prev icon-chevron-right" type="button" @click="skillsPageNumber--"
                         :disabled="isFirstSkillsPage"></button>
                     <span>|</span>

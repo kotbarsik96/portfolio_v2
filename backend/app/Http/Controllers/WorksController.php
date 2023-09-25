@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\WorkFilter;
 use App\Models\WorksStack;
 use Illuminate\Http\Request;
 use App\Models\Work;
@@ -13,6 +14,7 @@ use App\Models\Tag;
 use App\Models\Stack;
 use App\Models\Image;
 use App\Http\Controllers\TablesController;
+use Illuminate\Database\Schema\Builder;
 
 class WorksController extends Controller
 {
@@ -69,9 +71,18 @@ class WorksController extends Controller
         return $obj->$column;
     }
 
-    public function all()
+    public function all(Request $request)
     {
         $works = Work::all();
+        foreach ($works as $key => $work) {
+            $works[$key] = $this->getWorkData($work);
+        }
+        return $works;
+    }
+
+    public function allFiltered(WorkFilter $request)
+    {
+        $works = Work::filter($request)->get();
         foreach ($works as $key => $work) {
             $works[$key] = $this->getWorkData($work);
         }
