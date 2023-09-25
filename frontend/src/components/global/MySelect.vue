@@ -25,6 +25,13 @@ export default {
         },
     },
     mounted() {
+        if (this.values[0])
+            this.setValue(this.values[0]);
+
+        setTimeout(() => {
+            this.$emit('update:modelValue', this.value);
+        }, 0);
+
         document.addEventListener('click', (event) => {
             if (event.target.closest('.select') === this.$el)
                 return;
@@ -34,7 +41,7 @@ export default {
     },
     data() {
         return {
-            value: this.values[0],
+            value: '',
             isShown: false
         }
     },
@@ -52,8 +59,9 @@ export default {
 
             this.value = value;
         },
-        refresh(){
-            this.value = this.values[0];
+        refresh() {
+            this.value = '';
+            this.setValue(this.values[0]);
         }
     },
     watch: {
