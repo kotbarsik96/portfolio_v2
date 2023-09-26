@@ -36,13 +36,13 @@
                             <a class="link list__item-title" href="#portfolio">
                                 Работ в портфолио:
                             </a>
-                            <MyTypeText class="list__item-content" :text="counts.works" queue></MyTypeText>
+                            <MyTypeText class="list__item-content" :text="worksCount" queue></MyTypeText>
                         </li>
                         <li class="list__item icon-web-development">
                             <a class="link list__item-title" href="#skills">
                                 Навыков в портфолио:
                             </a>
-                            <MyTypeText class="list__item-content" :text="counts.skills" queue></MyTypeText>
+                            <MyTypeText class="list__item-content" :text="skillsCount" queue></MyTypeText>
                         </li>
                     </ul>
                     <p class="about__text-par">
@@ -80,6 +80,18 @@ export default {
     },
     computed: {
         ...mapState(useMyStore, ['taxonomies', 'counts']),
+        worksCount() {
+            if (isNaN(parseInt(this.counts.works)))
+                return '';
+
+            return this.counts.works.toString();
+        },
+        skillsCount() {
+            if (isNaN(parseInt(this.counts.skills)))
+                return '';
+
+            return this.counts.skills.toString();
+        },
         stack() {
             if (!this.taxonomies.stack)
                 return '';

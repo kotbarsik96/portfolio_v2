@@ -128,7 +128,6 @@ export default {
         },
         // анимирует конкретный участок текста
         animText(text, el = this.$refs.rootElem) {
-            text = text.toString();
             text = text.replace(/\s{2,}/g, '');
 
             return new Promise(resolve => {
@@ -148,5 +147,3 @@ export default {
     },
 }
 </script>
-
-<style></style>

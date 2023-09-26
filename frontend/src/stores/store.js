@@ -7,7 +7,7 @@ axios.defaults.withCredentials = true;
 export const useMyStore = defineStore("myStore", {
     state() {
         return {
-            theme: localStorage.getItem("kb96_portfolio_theme") || "light",
+            theme: localStorage.getItem("kb96_portfolio_theme"),
             isMe: false,
             qrCode: null,
             isLoading: false,
@@ -16,6 +16,16 @@ export const useMyStore = defineStore("myStore", {
         }
     },
     actions: {
+        init() {
+            // если в localstorage нет темы, будет установлена отсюда
+            if (!localStorage.getItem("kb96_portfolio_theme")) {
+                const isPreferredDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+                if (isPreferredDarkTheme)
+                    this.theme = 'dark';
+                else this.theme = 'light';
+            }
+        },
         async checkIfIsMe() {
             try {
                 const user = Cookie.get("user");

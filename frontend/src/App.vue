@@ -41,7 +41,9 @@ export default {
         ModalWindow
     },
     created() {
-        useMyStore().loadAllData();
+        const store = useMyStore();
+        store.loadAllData();
+        store.init();
     },
     mounted() {
         // цветовая тема
@@ -50,11 +52,6 @@ export default {
         myStore.$subscribe((mutation, state) => {
             localStorage.setItem('kb96_portfolio_theme', state.theme);
             this.setThemeClassname();
-
-            if (!state.isMe && this.$route.meta.mustBeMe)
-                this.$router.push({ name: "Home" });
-            if (state.isMe && this.$route.meta.mustNotBeMe)
-                this.$router.push({ name: "Home" });
         });
 
         const modalsStore = useModalsStore();

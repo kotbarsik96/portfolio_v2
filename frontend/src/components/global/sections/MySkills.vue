@@ -69,7 +69,7 @@ export default {
         });
         this.intersectObserver.observe(this.$refs.intersection);
     },
-    computed :{
+    computed: {
         ...mapState(useMyStore, ['counts'])
     },
     methods: {
