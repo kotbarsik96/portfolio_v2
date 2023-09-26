@@ -6,12 +6,12 @@
             </h3>
             <div class="skills">
                 <div class="skills__search">
-                    <MySearch inputId="skills-search" placeholder="Поиск" name="search"></MySearch>
+                    <MySearch inputId="skills-search" placeholder="Поиск" name="search" v-model="searchValue"></MySearch>
                 </div>
                 <div class="skills__list-container">
-                    <ul v-if="items.length > 0" class="skills__list">
+                    <TransitionGroup v-if="items.length > 0" tag="ul" class="skills__list" name="skill-item">
                         <SkillItem v-for="item in items" :key="item.id" :data="item"></SkillItem>
-                    </ul>
+                    </TransitionGroup>
                     <div v-else class="empty">
                         <img :src="emptyIcon" alt="" class="empty__icon">
                         <div class="empty__text">
@@ -23,12 +23,10 @@
                             </p>
                         </div>
                     </div>
-                    <button class="button list-more" type="button">
-                        Показать еще
-                    </button>
                 </div>
             </div>
         </div>
+        <div ref="intersection"></div>
     </section>
 </template>
 
@@ -37,6 +35,9 @@ import MySearch from '../MySearch.vue';
 import SkillItem from '../SkillItem.vue';
 import emptyIcon from '@/assets/images/icons/cricket.svg';
 import axios from 'axios';
+
+const loadPerQuery = 2;
+const initialSkillsCount = 4;
 
 export default {
     name: 'MySkills',
@@ -47,16 +48,89 @@ export default {
     data() {
         return {
             emptyIcon,
+            searchValue: '',
+            intersectObserver: null,
+            isLoadingItems: false,
             items: [],
+            skillsTotalCount: 0,
+            loadedCount: initialSkillsCount,
+            loadPerQuery,
         }
     },
+    created() {
+        this.loadskillsTotalCount();
+        this.loadSkills();
+    },
     mounted() {
-        this.loadItems();
+        this.intersectObserver = new IntersectionObserver(this.onIntersect, {
+            root: null,
+            threshold: 1
+        });
+        this.intersectObserver.observe(this.$refs.intersection);
     },
     methods: {
-        async loadItems() {
-            const res = await axios.get(`${import.meta.env.VITE_API_LINK}skills`);
-            this.items = res.data;
+        onIntersect(entries) {
+            if (entries.find(e => e.isIntersecting)) {
+                this.loadMoreSkills();
+            }
+        },
+        getFilters() {
+            return {
+                search: this.searchValue
+            };
+        },
+        async loadskillsTotalCount() {
+            try {
+                const res = await axios(`${import.meta.env.VITE_API_LINK}skills/count`);
+                if (res.data) {
+                    this.skillsTotalCount = parseInt(res.data);
+                }
+            } catch (err) { }
+        },
+        async loadSkills() {
+            this.isLoadingItems = true;
+
+            const url = `${import.meta.env.VITE_API_LINK}skills/filter`;
+            const params = Object.assign(this.getFilters(), {
+                limit: this.loadedCount
+            });
+            try {
+                const res = await axios(url, { params });
+                if (Array.isArray(res.data)) {
+                    this.items = res.data;
+                } else {
+                    this.items = [];
+                }
+            } catch (err) { }
+
+            if (this.loadedCount < this.items.length)
+                this.loadedCount = this.items.length;
+
+            this.isLoadingItems = false;
+        },
+        async loadMoreSkills() {
+            this.isLoadingItems = true;
+
+            const url = `${import.meta.env.VITE_API_LINK}skills/filter`;
+            const params = Object.assign(this.getFilters(), {
+                limit: this.loadPerQuery,
+                offset: this.loadedCount
+            });
+
+            try {
+                const res = await axios(url, { params });
+                if (Array.isArray(res.data)) {
+                    this.items = this.items.concat(res.data);
+                    this.loadedCount += res.data.length;
+                }
+            } catch (err) { }
+
+            this.isLoadingItems = false;
+        }
+    },
+    watch: {
+        searchValue() {
+            this.loadSkills();
         }
     }
 }

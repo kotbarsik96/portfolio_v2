@@ -131,11 +131,11 @@ export default {
                 if (Array.isArray(res.data)) {
                     newWorks = res.data;
                     this.works = this.works.concat(newWorks);
+                    this.offset += newWorks.length;
+                    this.loadedWorksCount += newWorks.length;
                 }
             } catch (err) { }
 
-            this.offset += newWorks.length;
-            this.loadedWorksCount += newWorks.length;
             this.isLoadingWorks = false;
         }
     },

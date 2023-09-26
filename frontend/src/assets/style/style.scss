@@ -166,6 +166,30 @@ label {
     max-width: 500px;
 }
 
+// for skill items 
+.skill-item-enter-active,
+.skill-item-leave-active,
+.skill-item-move {
+    transition: all 1s;
+    overflow: hidden;
+}
+
+.skill-item-enter-from,
+.skill-item-leave-to {
+    transform: scale(0);
+    max-height: 0;
+    max-width: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.skill-item-enter-to,
+.skill-item-leave-from {
+    transform: scale(1);
+    max-height: 500px;
+    max-width: 500px;
+}
+
 /* <ANIMATIONS, TRANSITIONS>===================================================================== */
 
 /* <UI>========================================================================================== */

@@ -8,9 +8,21 @@ use App\Models\Skill;
 use App\Models\Video;
 use App\Models\Image;
 use App\Models\Work;
+use App\Filters\SkillFilter;
 
 class SkillsController extends Controller
 {
+    public function getSkillData($skill)
+    {
+        if (is_numeric($skill->video_id))
+            $skill->video = Video::find($skill->video_id);
+        if (is_numeric($skill->image_id))
+            $skill->image = Image::find($skill->image_id);
+
+        $skill->links = $this->getWorksLinks($skill);
+        return $skill;
+    }
+
     public function getWorksLinks($skill)
     {
         $worksSkills = WorksSkills::where('skill_id', $skill->id)->get();
@@ -36,15 +48,28 @@ class SkillsController extends Controller
     public function all()
     {
         $skills = Skill::all();
-        foreach ($skills as $skill) {
-            if (is_numeric($skill->video_id))
-                $skill->video = Video::find($skill->video_id);
-            if (is_numeric($skill->image_id))
-                $skill->image = Image::find($skill->image_id);
-
-            $skill->links = $this->getWorksLinks($skill);
+        foreach ($skills as $key => $skill) {
+            $skills[$key] = $this->getSkillData($skill);
         }
         return $skills;
+    }
+
+    public function allFiltered(SkillFilter $request)
+    {
+        $queries = $request->queries();
+        $limit = array_key_exists('limit', $queries) ? $queries['limit'] : 0;
+        $offset = array_key_exists('offset', $queries) ? $queries['offset'] : 0;
+
+        $skills = Skill::filter($request)->getOffset($limit, $offset);
+        foreach ($skills as $key => $skill) {
+            $skills[$key] = $this->getSkillData($skill);
+        }
+        return $skills;
+    }
+
+    public function count()
+    {
+        return Skill::count();
     }
 
     public function single($id)
@@ -53,24 +78,7 @@ class SkillsController extends Controller
         if (!$skill)
             return response(['not_found' => true]);
 
-        if (is_numeric($skill->video_id)) {
-            $video = Video::find($skill->video_id);
-            if ($video) {
-                $skill->video = $video;
-            } else {
-                $skill->update(['video_id' => null]);
-            }
-        }
-        if (is_numeric($skill->image_id)) {
-            $image = Image::find($skill->image_id);
-            if ($image) {
-                $skill->image = $image;
-            } else {
-                $skill->update(['image_id' => null]);
-            }
-        }
-
-        $skill->links = $this->getWorksLinks($skill);
+        $skill = $this->getSkillData($skill);
 
         return response($skill);
     }

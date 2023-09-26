@@ -32,6 +32,8 @@ Route::get('/works/count', [WorksController::class, 'count']);
 
 Route::get('/skills', [SkillsController::class, 'all']);
 Route::get('/skill/{id}', [SkillsController::class, 'single']);
+Route::get('/skills/filter', [SkillsController::class, 'allFiltered']);
+Route::get('/skills/count', [SkillsController::class, 'count']);
 
 Route::get('/taxonomies/{title}', [TaxonomiesController::class, 'all']);
 
