@@ -11,7 +11,7 @@ export default {
     name: 'MyTypeText',
     props: {
         text: {
-            type: String,
+            type: [String, Number],
         },
         textsList: {
             /* 0: { tagName: 'a', attributes: { href: '#' }, text: '' }
@@ -26,7 +26,7 @@ export default {
     },
     data() {
         return {
-            id: Date.now() + (Math.random() * 10) * (Math.random() * 5),
+            id: parseInt(Date.now() + (Math.random() * 10) * (Math.random() * 5)),
             textsListComponent: [],
             minHeight: 0,
             isInSight: false,
@@ -53,7 +53,7 @@ export default {
         window.addEventListener('scroll', this.onWindowScroll);
         nextTick().then(this.onWindowScroll);
     },
-    beforeUnmount(){
+    beforeUnmount() {
         window.removeEventListener('scroll', this.onWindowScroll);
     },
     methods: {
@@ -128,6 +128,7 @@ export default {
         },
         // анимирует конкретный участок текста
         animText(text, el = this.$refs.rootElem) {
+            text = text.toString();
             text = text.replace(/\s{2,}/g, '');
 
             return new Promise(resolve => {

@@ -35,9 +35,12 @@ import MySearch from '../MySearch.vue';
 import SkillItem from '../SkillItem.vue';
 import emptyIcon from '@/assets/images/icons/cricket.svg';
 import axios from 'axios';
+import { mapState } from 'pinia';
+import { useMyStore } from '@/stores/store.js';
 
 const loadPerQuery = 2;
 const initialSkillsCount = 4;
+
 
 export default {
     name: 'MySkills',
@@ -52,13 +55,11 @@ export default {
             intersectObserver: null,
             isLoadingItems: false,
             items: [],
-            skillsTotalCount: 0,
             loadedCount: initialSkillsCount,
             loadPerQuery,
         }
     },
     created() {
-        this.loadskillsTotalCount();
         this.loadSkills();
     },
     mounted() {
@@ -68,24 +69,21 @@ export default {
         });
         this.intersectObserver.observe(this.$refs.intersection);
     },
+    computed :{
+        ...mapState(useMyStore, ['counts'])
+    },
     methods: {
-        onIntersect(entries) {
+        async onIntersect(entries) {
             if (entries.find(e => e.isIntersecting)) {
-                this.loadMoreSkills();
+                await this.loadMoreSkills();
+                if (this.loadedCount >= this.counts.skills)
+                    this.intersectObserver.disconnect();
             }
         },
         getFilters() {
             return {
                 search: this.searchValue
             };
-        },
-        async loadskillsTotalCount() {
-            try {
-                const res = await axios(`${import.meta.env.VITE_API_LINK}skills/count`);
-                if (res.data) {
-                    this.skillsTotalCount = parseInt(res.data);
-                }
-            } catch (err) { }
         },
         async loadSkills() {
             this.isLoadingItems = true;

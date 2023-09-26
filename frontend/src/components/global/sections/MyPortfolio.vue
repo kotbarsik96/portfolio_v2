@@ -56,13 +56,11 @@ export default {
     },
     created() {
         this.loadWorks();
-        this.loadWorksCount();
     },
     data() {
         return {
             works: null,
             emptyIcon,
-            worksCount: 0,
             checkedFilters: [],
             loadPerQuery,
             loadedWorksCount: firstLoadedCount,
@@ -71,21 +69,15 @@ export default {
         }
     },
     computed: {
-        ...mapState(useMyStore, ['worksFilterBody']),
+        ...mapState(useMyStore, ['worksFilterBody', 'counts']),
         showMoreButton() {
             return this.works
                 && this.works.length > 0
-                && this.worksCount > this.works.length
+                && this.counts.works > this.loadedWorksCount
                 && !this.isLoadingWorks;
         },
     },
     methods: {
-        async loadWorksCount() {
-            try {
-                const res = await axios(`${import.meta.env.VITE_API_LINK}works/count`);
-                this.worksCount = parseInt(res.data);
-            } catch (err) { }
-        },
         getFilters() {
             const data = {};
             this.checkedFilters.forEach(obj => {

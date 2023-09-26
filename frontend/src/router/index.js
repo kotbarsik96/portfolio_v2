@@ -118,6 +118,7 @@ const router = createRouter({
 router.beforeEach(async (to) => {
     const myStore = useMyStore();
     const isMe = await myStore.checkIfIsMe();
+    await myStore.loadCounts();
 
     if (!isMe && to.meta.mustBeMe)
         return { name: "Home" };

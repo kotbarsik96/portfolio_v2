@@ -12,6 +12,7 @@ export const useMyStore = defineStore("myStore", {
             qrCode: null,
             isLoading: false,
             taxonomies: {},
+            counts: {}
         }
     },
     actions: {
@@ -61,6 +62,23 @@ export const useMyStore = defineStore("myStore", {
             } catch (err) { }
 
             return true;
+        },
+        loadCounts() {
+            return new Promise(resolve => {
+                const keys = ['works', 'skills'];
+                keys.forEach(async (key, i, arr) => {
+                    const url = `${import.meta.env.VITE_API_LINK}${key}/count`;
+                    try {
+                        const res = await axios(url);
+                        if (!res.data.error) {
+                            this.counts[key] = parseInt(res.data);
+                        }
+                    } catch (err) { }
+
+                    if (arr.length - 1 === i)
+                        resolve();
+                });
+            });
         }
     },
     getters: {

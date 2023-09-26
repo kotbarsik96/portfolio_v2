@@ -29,20 +29,20 @@
                                 Стек:
                             </span>
                             <span class="list__item-content">
-                                <MyTypeText :text="stack" queue></MyTypeText>
+                                <MyTypeText :text="stack" queue speed="30"></MyTypeText>
                             </span>
                         </li>
                         <li class="list__item icon-portfolio">
                             <a class="link list__item-title" href="#portfolio">
                                 Работ в портфолио:
                             </a>
-                            <MyTypeText class="list__item-content" text="10" queue></MyTypeText>
+                            <MyTypeText class="list__item-content" :text="counts.works" queue></MyTypeText>
                         </li>
                         <li class="list__item icon-web-development">
                             <a class="link list__item-title" href="#skills">
                                 Навыков в портфолио:
                             </a>
-                            <MyTypeText class="list__item-content" text="15" queue></MyTypeText>
+                            <MyTypeText class="list__item-content" :text="counts.skills" queue></MyTypeText>
                         </li>
                     </ul>
                     <p class="about__text-par">
@@ -79,7 +79,7 @@ export default {
         };
     },
     computed: {
-        ...mapState(useMyStore, ['taxonomies']),
+        ...mapState(useMyStore, ['taxonomies', 'counts']),
         stack() {
             if (!this.taxonomies.stack)
                 return '';
