@@ -19,11 +19,11 @@ RUN apt-get -y update && apt-get -y upgrade && apt-get install -y \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
-COPY ./backend/_docker/php.ini /usr/local/etc/php/conf.d/php.ini
+COPY ./portfolio/backend/_docker/php.ini /usr/local/etc/php/conf.d/php.ini
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 RUN curl -sS https://getcomposer.org/installer | php -- \
     --filename=composer \
     --install-dir=/usr/local/bin
 
-WORKDIR /var/www/backend
+WORKDIR /var/www/portfolio/backend
