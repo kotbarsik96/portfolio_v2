@@ -187,7 +187,7 @@ export default {
             await onTransitionEnd(this.$refs.filterBody);
             if (!this.$refs.filterBody)
                 return;
-            
+
             this.$refs.filterBody.style.removeProperty('transition');
             this.isTogglingBody = false;
         },
@@ -247,6 +247,9 @@ export default {
         },
         refresh() {
             this.checkedValues = [];
+            if (!this.$refs.filterInputButton || !this.$refs.comment)
+                return;
+
             this.$refs.filterInputButton.forEach(inp => inp.checked = false);
             this.$refs.comment.forEach(span => span.textContent = '');
             this.$refs.attachedUrl.forEach(link => {

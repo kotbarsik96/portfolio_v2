@@ -55,7 +55,10 @@ class VideoController extends Controller
             $foldersPath .= '/' . $requestSubfolder;
 
         $file->move(public_path($foldersPath), $filename);
-        $ffprobe = FFProbe::create();
+        $ffprobe = FFProbe::create([
+            'ffmpeg.binaries' => '/usr/bin/ffmpeg', // which ffmpeg
+            'ffprobe.binaries' => '/usr/bin/ffprobe' // which ffprobe
+        ]);
         $filepath = public_path($foldersPath) . '/' . $filename;
         $formatted = $ffprobe
             ->format($filepath);

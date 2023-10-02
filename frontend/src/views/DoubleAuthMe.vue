@@ -52,6 +52,7 @@ export default {
             store.checkIfIsMe();
             store.authData = null;
             store.isLoading = false;
+            this.$router.push({ name: 'Home' });
         }
     },
     computed: {
