@@ -83,9 +83,9 @@ export default {
         setThemeClassname() {
             const store = useMyStore();
             if (store.theme === 'dark')
-                this.$refs.wrapper.classList.add('dark-theme');
+                document.querySelector('html').classList.add('dark-theme');
             if (store.theme === 'light')
-                this.$refs.wrapper.classList.remove('dark-theme');
+                document.querySelector('html').classList.remove('dark-theme');
         },
         async modifyAnchorLinks() {
             await nextTick();

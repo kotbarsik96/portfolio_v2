@@ -2,11 +2,12 @@
 @import "fonts.scss";
 
 /* <ПЕРЕМЕННЫЕ>================================================================================== */
-.wrapper {
+html {
     --body_background: #d5d5d5;
     --main_color: #b54a03;
     --color_2: #0056d7;
     --action_color: #eda600;
+    --action_color_opacity: #b7891d;
     --text_color: #4f4f4f;
     --text_color_modals: #fff;
     --dark: #e2e2e2;
@@ -14,11 +15,12 @@
     --cancel_color: #9e0000;
 }
 
-.wrapper.dark-theme {
+html.dark-theme {
     --body_background: #2f2f2f;
     --main_color: #3b0060;
     --color_2: #008787;
     --action_color: #c59900;
+    --action_color_opacity: #8e6f00;
     --text_color: #b6b6b6;
     --text_color_modals: #b6b6b6;
     --dark: #9f9f9f;
@@ -32,6 +34,31 @@
 }
 
 /* <СТИЛИ>======================================================================================= */
+html {
+    --theme_trans_dur: .3s;
+
+    scrollbar-color: var(--action_color) var(--body_background);
+    transition-property: scrollbar-color;
+    transition-duration: var(--theme_trans_dur);
+}
+
+::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+    background-color: var(--body_background);
+    transition-property: background-color;
+    transition-duration: var(--theme_trans_dur);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--action_color);
+    border-radius: 10px;
+
+    &:hover {
+        background-color: var(--action_color_opacity);
+    }
+}
+
 label {
     cursor: pointer;
 }
@@ -44,7 +71,7 @@ label {
     color: var(--text_color);
 
     transition-property: background-color, color;
-    transition-duration: 0.3s;
+    transition-duration: var(--theme_trans_dur);
 }
 
 .container {
