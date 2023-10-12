@@ -4,7 +4,7 @@
             {{ label }}
         </label>
         <TextInput :inputId="id" :placeholder="placeholder" :name="name" :type="type" :defalutValue="defaultValue"
-            v-model="value" ref="textInput"></TextInput>
+            v-model="value" ref="textInput" :numberonly="numberonly || false"></TextInput>
     </div>
 </template>
 
@@ -13,7 +13,7 @@ export default {
     name: 'InputItem',
     emits: ['update:modelValue'],
     props: {
-        modelValue: String,
+        modelValue: [String, Number],
         label: {
             type: String,
             default: ''
@@ -26,9 +26,10 @@ export default {
             type: String,
             default: 'text'
         },
-        defaultValue: String,
+        defaultValue: [String, Number],
         name: String,
         placeholder: String,
+        numberonly: Boolean
     },
     data() {
         return {

@@ -11,8 +11,9 @@ class Work extends FilterableModel
     protected $fillable = [
         'title',
         'url',
+        'pages_count',
         'tag_id',
         'image_desktop_id',
-        'image_mobile_id'
+        'image_mobile_id',
     ];
 }

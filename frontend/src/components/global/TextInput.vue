@@ -2,8 +2,8 @@
     <div class="text-input">
         <div class="text-input__wrapper">
             <span v-if="iconName" class="text-input__icon" :class="[iconName]"></span>
-            <input class="text-input__input" ref="input" v-model="value" :type="type" :placeholder="placeholder || ''" :id="inputId"
-                :name="name" @keyup.enter="$emit('enterKeyup')">
+            <input class="text-input__input" ref="input" v-model="value" :type="type" :placeholder="placeholder || ''"
+                :id="inputId" :name="name" @keyup.enter="$emit('enterKeyup')" @input="onInput">
         </div>
     </div>
 </template>
@@ -13,7 +13,7 @@ export default {
     name: 'TextInput',
     emits: ['enterKeyup', 'update:modelValue'],
     props: {
-        modelValue: String,
+        modelValue: [String, Number],
         iconName: {
             type: String
         },
@@ -33,7 +33,8 @@ export default {
         defaultValue: {
             type: String,
             default: ''
-        }
+        },
+        numberonly: Boolean
     },
     data() {
         return {
@@ -44,15 +45,19 @@ export default {
         value() {
             this.$emit('update:modelValue', this.value);
         },
-        defaultValue(){
-            if(!this.value) {
+        defaultValue() {
+            if (!this.value) {
                 this.value = this.defaultValue;
             }
         }
     },
     methods: {
-        refresh(){
+        refresh() {
             this.value = '';
+        },
+        onInput(event) {
+            if (this.numberonly)
+                event.target.value = event.target.value.replace(/\D/g, '');
         }
     }
 }

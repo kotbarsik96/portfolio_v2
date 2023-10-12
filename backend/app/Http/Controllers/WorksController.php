@@ -14,8 +14,6 @@ use App\Models\Tag;
 use App\Models\Stack;
 use App\Models\Image;
 use App\Http\Controllers\TablesController;
-use Illuminate\Database\Schema\Builder;
-
 class WorksController extends Controller
 {
     public function getWorkDataByModel($array, $dataKey, $model)
@@ -37,7 +35,6 @@ class WorksController extends Controller
 
     public function getWorkData($work)
     {
-
         if (is_numeric($work->tag_id))
             $work->tag = $this->getColumnById($work->tag_id, Tag::class);
         if (is_numeric($work->image_desktop_id))
@@ -121,7 +118,8 @@ class WorksController extends Controller
             'url' => 'active_url',
             'tag_id' => 'required|numeric',
             'image_desktop_id' => 'numeric|nullable',
-            'image_mobile_id' => 'numeric|nullable'
+            'image_mobile_id' => 'numeric|nullable',
+            'pages_count' => 'numeric|nullable|max:250'
         ]);
         $fields = [
             'title' => trim($request['title']),
@@ -129,6 +127,7 @@ class WorksController extends Controller
             'tag_id' => $request['tag_id'],
             'image_desktop_id' => $request['image_desktop_id'],
             'image_mobile_id' => $request['image_mobile_id'],
+            'pages_count' => $request['pages_count']
         ];
         return $fields;
     }

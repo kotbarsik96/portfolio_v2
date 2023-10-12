@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->id();
             $table->string('title');
             $table->string('url');
+            $table->tinyInteger('pages_count');
             $table->foreignId('tag_id')
                 ->constrained(table: 'tags')
                 ->onDelete('restrict')

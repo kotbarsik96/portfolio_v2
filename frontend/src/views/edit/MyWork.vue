@@ -14,6 +14,10 @@
                     name="work_url" :defaultValue="workData.url" v-model="workUrl"></InputItem>
             </div>
             <div class="add__inputs-section">
+                <InputItem class="input-item--full" ref="pagesCountInput" numberonly label="Количество страниц" placeholder="Количество страниц" id="work-pages-count"
+                    name="pages_count" :defaultValue="workData.pages_count" v-model="pagesCount"></InputItem>
+            </div>
+            <div class="add__inputs-section">
                 <div class="input-item">
                     <span class="input-item__label">
                         Тег
@@ -106,6 +110,7 @@ export default {
             workData: {},
             workTitle: '',
             workUrl: '',
+            pagesCount: '',
             tagValue: '',
             imageDesktopId: null,
             imageMobileId: null,
@@ -178,6 +183,7 @@ export default {
                 url: this.workUrl,
                 checkedValues: this.checkedValues,
                 tag: this.tagValue,
+                pages_count: this.pagesCount,
                 image_desktop_id: this.imageDesktopId,
                 image_mobile_id: this.imageMobileId
             }
