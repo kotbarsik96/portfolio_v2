@@ -16,4 +16,17 @@ class Image extends Model
         'width',
         'height'
     ];
+
+    public static function existsInTables()
+    {
+        return [
+            'skills' => [
+                'image_id'
+            ],
+            'works' => [
+                'image_mobile_id',
+                'image_desktop_id'
+            ]
+        ];
+    }
 }

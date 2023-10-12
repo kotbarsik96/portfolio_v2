@@ -19,4 +19,13 @@ class Video extends Model
         'width',
         'height'
     ];
+
+    public static function existsInTables()
+    {
+        return [
+            'skills' => [
+                'video_id'
+            ]
+        ];
+    }
 }
