@@ -3,7 +3,7 @@
         <div class="portfolio-item__buttons">
             <button v-if="data.image_desktop" class="portfolio-item__button icon-desktop"
                 :class="{ '__active': imageType === 'desktop' }" type="button" @click="changeImage('desktop')"></button>
-            <button class="portfolio-item__button icon-question-mark" :class="{ '__active': isShownSkills }" type="button"
+            <button v-if="slicedSkillsPages.length > 0" class="portfolio-item__button icon-question-mark" :class="{ '__active': isShownSkills }" type="button"
                 @click="toggleSkills"></button>
             <button v-if="data.image_mobile" class="portfolio-item__button icon-mobile"
                 :class="{ '__active': imageType === 'mobile' }" type="button" @click="changeImage('mobile')"></button>
