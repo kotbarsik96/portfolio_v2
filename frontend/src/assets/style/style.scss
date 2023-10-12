@@ -716,6 +716,10 @@ label {
         width: var(--toddler_size);
         height: var(--toddler_size);
     }
+
+    @media (max-width: 499px){
+        max-height: 75%;
+    }
 }
 
 /* <VIDEO>======================================================================================= */
@@ -1766,12 +1770,6 @@ label {
 
         &__links-pagination {
             bottom: 15px;
-        }
-    }
-
-    @media (max-width: 369px) {
-        &__links-list {
-            margin-top: 80px;
         }
     }
 }

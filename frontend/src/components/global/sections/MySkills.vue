@@ -65,7 +65,7 @@ export default {
     mounted() {
         this.intersectObserver = new IntersectionObserver(this.onIntersect, {
             root: null,
-            threshold: 1
+            threshold: 0.5
         });
         this.intersectObserver.observe(this.$refs.intersection);
     },

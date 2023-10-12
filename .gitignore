@@ -19,5 +19,6 @@ yarn-error.log
 /.vscode
 
 *.sql
+kotbarsik96.sql
 /tmp
 *bfg*
