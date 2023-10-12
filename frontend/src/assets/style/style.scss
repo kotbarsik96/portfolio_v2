@@ -991,7 +991,7 @@ label {
     &__list {
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;
         flex-wrap: wrap;
         width: 100%;
     }
@@ -1488,7 +1488,7 @@ label {
         width: 100%;
         display: flex;
         flex-wrap: wrap;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
     }
 

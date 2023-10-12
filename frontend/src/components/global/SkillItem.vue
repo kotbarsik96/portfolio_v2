@@ -5,7 +5,7 @@
                 type="button" @click="changeMedia('image')"></button>
             <button v-if="data.video" class="skill-item__button icon-video" :class="{ '__active': mediaType === 'video' }"
                 type="button" @click="changeMedia('video')"></button>
-            <button class="portfolio-item__button icon-question-mark" :class="{ '__active': isShownLinks }" type="button"
+            <button v-if="slicedLinksPages.length > 0" class="portfolio-item__button icon-question-mark" :class="{ '__active': isShownLinks }" type="button"
                 @click="toggleLinks"></button>
             <RouterLink v-if="isMe" class="skill-item__button icon-pencil"
                 :to="{ name: 'EditSkill', params: { id: data.id } }">
