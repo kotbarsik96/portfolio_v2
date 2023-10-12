@@ -936,6 +936,10 @@ label {
         &__nav-item {
             padding: 10px 0;
         }
+
+        &__nav-link {
+            color: var(--text_color_modals);
+        }
     }
 }
 
