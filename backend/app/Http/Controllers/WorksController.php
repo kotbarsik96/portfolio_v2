@@ -88,7 +88,10 @@ class WorksController extends Controller
         $limit = array_key_exists('limit', $queries) ? $queries['limit'] : 0;
         $offset = array_key_exists('offset', $queries) ? $queries['offset'] : 0;
         
-        $works = Work::filter($request)->getOffset($limit, $offset);
+        $works = Work::filter($request)
+            ->offsetLimit($limit, $offset)
+            ->sort()
+            ->get();
         foreach ($works as $key => $work) {
             $works[$key] = $this->getWorkData($work);
         }

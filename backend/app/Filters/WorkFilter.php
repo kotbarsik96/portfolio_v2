@@ -15,7 +15,7 @@ class WorkFilter extends QueryFilter
                 ->join('types', 'types.id', '=', 'works_types.type_id')
                 ->whereIn('types.title', $titles)
                 ->groupBy('works_types.work_id')
-                ->havingRaw('COUNT(DISTINCT types.id) > ?', [0]);
+                ->havingRaw('COUNT(DISTINCT types.id) = ?', [count($titles)]);
         });
     }
 

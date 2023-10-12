@@ -60,7 +60,7 @@ class SkillsController extends Controller
         $limit = array_key_exists('limit', $queries) ? $queries['limit'] : 0;
         $offset = array_key_exists('offset', $queries) ? $queries['offset'] : 0;
 
-        $skills = Skill::filter($request)->getOffset($limit, $offset);
+        $skills = Skill::filter($request)->offsetLimit($limit, $offset)->get();
         foreach ($skills as $key => $skill) {
             $skills[$key] = $this->getSkillData($skill);
         }

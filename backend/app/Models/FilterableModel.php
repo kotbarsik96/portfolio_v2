@@ -13,17 +13,17 @@ class FilterableModel extends Model
         return $request->apply($builder);
     }
 
-    public function scopeGetOffset(Builder $query, $limit, $offset)
+    public function scopeOffsetLimit(Builder $query, $limit, $offset)
     {
         if (!$limit && !$offset)
-            return $query->get();
+            return $query;
 
         if (!$limit && $offset)
-            return $query->offset($offset)->get();
+            return $query->offset($offset);
 
         if ($limit && !$offset)
-            return $query->limit($limit)->get();
+            return $query->limit($limit);
 
-        return $query->offset($offset)->limit($limit)->get();
+        return $query->offset($offset)->limit($limit);
     }
 }
