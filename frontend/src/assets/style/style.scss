@@ -1221,7 +1221,7 @@ label {
         }
 
         &:disabled {
-            cursor: not-allowed;
+            cursor: default;
 
             &::before {
                 color: var(--dark_2);
