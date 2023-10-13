@@ -990,6 +990,11 @@ label {
         align-items: center;
         flex: 1 1 auto;
         align-self: stretch;
+
+        .loading {
+            width: 100px;
+            height: 100px;
+        }
     }
 
     &__list {
@@ -1019,6 +1024,10 @@ label {
         &__list-container {
             order: 2;
             margin-right: 0;
+        }
+
+        &__list-container {
+            flex: 0 0 100%;
         }
     }
 

@@ -22,3 +22,4 @@ yarn-error.log
 kotbarsik96.sql
 /tmp
 *bfg*
+backend/config/cors.php
